@@ -66,7 +66,6 @@ logs/
 .env
 .env.local
 .env.*
-config.json
 
 # Build / Dependency directories
 dist/
