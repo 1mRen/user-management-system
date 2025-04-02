@@ -1,0 +1,19 @@
+{
+  "database": {
+    "host": "localhost",
+    "port": 3306,
+    "user": "your-username",
+    "password": "your-password",
+    "database": "your-database-name"
+  },
+  "secret": "your-secret-key",
+  "emailFrom": "your-email@example.com",
+  "smtpOptions": {
+    "host": "your-smtp-host",
+    "port": 587,
+    "auth": {
+      "user": "your-smtp-user",
+      "pass": "your-smtp-pass"
+    }
+  }
+}
