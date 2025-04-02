@@ -25,5 +25,5 @@ function model(sequelize) {
     timestamps: false  // Disable default timestamp fields
   };
 
-  return sequelize.define('refreshToken', attributes, options);  // Use 'sequelize.define'
+  return sequelize.define('refreshToken', attributes, options); 
 }

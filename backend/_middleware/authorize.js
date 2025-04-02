@@ -1,6 +1,6 @@
+require('dotenv').config();
 const { expressjwt: jwt } = require('express-jwt');
-const { secret } = require('../config.json'); // Fix config path
-const db = require('../_helpers/db'); // Fix db path
+const db = require('../_helpers/db');
 
 module.exports = authorize;
 
@@ -11,7 +11,7 @@ function authorize(roles = []) {
 
   return [
     // Authenticate JWT token and attach user to request object (req.auth)
-    jwt({ secret, algorithms: ['HS256'], requestProperty: 'auth' }),
+    jwt({ secret: process.env.JWT_SECRET, algorithms: ['HS256'], requestProperty: 'auth' }),
 
     // Debugging: Log token data
     (req, res, next) => {
