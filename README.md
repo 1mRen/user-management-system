@@ -176,7 +176,7 @@ To ensure system reliability, various tests have been conducted:
   - View the functional testing results: [Functional Testing Results](https://docs.google.com/document/d/1SMUoEOjGPUuY5pzQdg6QK1Dx_CC2AjwNqycjrUO3TAg/edit?tab=t.0)
 
 - **Security Testing**
-  - Assesses vulnerabilities like SQL injection, XSS, CSRF protection, and password security.
+  - Assesses vulnerabilities.
   - View the security testing results: [Security Testing Results](https://docs.google.com/document/d/1SMUoEOjGPUuY5pzQdg6QK1Dx_CC2AjwNqycjrUO3TAg/edit?tab=t.xxta1s6lwy08)
 
 ---
@@ -185,11 +185,21 @@ To ensure system reliability, various tests have been conducted:
 
 [Back to Table of Contents](#table-of-contents)
 
+Contributions are welcome! If you’d like to contribute, please follow these steps:
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature-branch`)
+3. Make your changes
+4. Commit your changes (`git commit -m 'Add new feature'`)
+5. Push to the branch (`git push origin feature-branch`)
+6. Open a Pull Request
+
 ---
 
 ## License
 
 [Back to Table of Contents](#table-of-contents)
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
