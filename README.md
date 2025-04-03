@@ -18,6 +18,8 @@
 
 ## Introduction
 
+[Back to Table of Contents](#table-of-contents)
+
 The **User Management System** is a web-based application designed to streamline user authentication, authorization, and account management. It provides a secure and efficient way to handle user registration, authentication, and role-based access control. 
 
 Built with **Node.js** and **MySQL** for the backend and **Angular** for the frontend, this system ensures a seamless experience for both users and administrators. Key features include JWT authentication, email verification, password recovery, profile management, and an admin dashboard for managing user accounts. Additionally, a fake backend implementation is available to facilitate development and testing without requiring a live backend.
@@ -31,9 +33,12 @@ This project is developed by:
 
 ## Installation Instructions
 
+[Back to Table of Contents](#table-of-contents)
+
 Follow these steps to set up the project locally:
 
 ### Prerequisites
+[Back to Table of Contents](#table-of-contents)
 Ensure you have the following installed on your system:
 - [Node.js](https://nodejs.org/) (Latest LTS version recommended)
 - [MySQL](https://www.mysql.com/)
@@ -42,6 +47,8 @@ Ensure you have the following installed on your system:
 ---
 
 ## Backend Setup (Node.js + MySQL)
+
+[Back to Table of Contents](#table-of-contents)
 
 1. **Clone the repository**  
    ```sh
@@ -90,6 +97,8 @@ Ensure you have the following installed on your system:
 
 ## Frontend Setup (Angular)
 
+[Back to Table of Contents](#table-of-contents)
+
 1. **Navigate to the frontend directory**
    ```sh
    cd ../frontend
@@ -110,6 +119,8 @@ Ensure you have the following installed on your system:
 
 ## API Documentation
 
+[Back to Table of Contents](#table-of-contents)
+
 The API documentation is available via Swagger. After starting the backend server, access it at:
 ```
 http://localhost:4000/api-docs/#
@@ -118,6 +129,8 @@ http://localhost:4000/api-docs/#
 ---
 
 ## Usage
+
+[Back to Table of Contents](#table-of-contents)
 
 1. **Register a new account**
    - Navigate to `/accounts/register` and fill in the required details.
@@ -154,6 +167,8 @@ http://localhost:4000/api-docs/#
 
 ## Testing
 
+[Back to Table of Contents](#table-of-contents)
+
 To ensure system reliability, various tests have been conducted:
 
 - **Functional Testing**
@@ -161,30 +176,26 @@ To ensure system reliability, various tests have been conducted:
   - View the functional testing results: [Functional Testing Results](https://docs.google.com/document/d/1SMUoEOjGPUuY5pzQdg6QK1Dx_CC2AjwNqycjrUO3TAg/edit?tab=t.0)
 
 - **Security Testing**
-  - Assesses vulnerabilities.
+  - Assesses vulnerabilities like SQL injection, XSS, CSRF protection, and password security.
   - View the security testing results: [Security Testing Results](https://docs.google.com/document/d/1SMUoEOjGPUuY5pzQdg6QK1Dx_CC2AjwNqycjrUO3TAg/edit?tab=t.xxta1s6lwy08)
 
 ---
 
 ## Contributing
 
-Contributions are welcome! If you’d like to contribute, please follow these steps:
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature-branch`)
-3. Make your changes
-4. Commit your changes (`git commit -m 'Add new feature'`)
-5. Push to the branch (`git push origin feature-branch`)
-6. Open a Pull Request
+[Back to Table of Contents](#table-of-contents)
 
 ---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+[Back to Table of Contents](#table-of-contents)
 
 ---
 
 ## Contact
+
+[Back to Table of Contents](#table-of-contents)
 
 For any inquiries or support, reach out to the developers:
 - **Marc Lawrence Magadan** - mmarclawrence@gmail.com
