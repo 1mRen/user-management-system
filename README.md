@@ -168,10 +168,6 @@ To ensure system reliability, various tests have been conducted:
   - Assesses vulnerabilities like SQL injection, XSS, CSRF protection, and password security.
   - View the security testing results: [Security Testing Results](https://docs.google.com/document/d/1SMUoEOjGPUuY5pzQdg6QK1Dx_CC2AjwNqycjrUO3TAg/edit?tab=t.xxta1s6lwy08)
 
-- **Performance Testing**
-  - Measures response times, load handling, and scalability.
-  - View performance test reports: [Link to reports]
-
 ---
 
 ## Contributing
