@@ -140,7 +140,17 @@ http://localhost:4000/api-docs/#
    - Navigate to `/profile` to update personal information.
    - Change password and security settings.
 
-5. **Admin functionalities**
+5. **Forgot Password**
+   - If you forgot your password, go to `/accounts/forgot-password`.
+   - Enter your registered email and submit the request.
+   - You will receive an email with a password reset link.
+
+6. **Reset Password**
+   - Click the link in the email to navigate to the password reset page.
+   - Enter a new password and confirm the changes.
+   - Log in with your new password at `/accounts/login`.
+
+7. **Admin functionalities**
    - Admin users can access the dashboard to manage users, roles, and permissions.
    - Navigate to `/admin/dashboard` for full administrative capabilities.
 
