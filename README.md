@@ -12,6 +12,8 @@
   - [Start the backend server](#start-the-backend-server)
 - [Frontend Setup (Angular)](#frontend-setup-angular)
 - [API Documentation](#api-documentation)
+- [Usage](#usage)
+- [Testing](#testing)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -116,6 +118,45 @@ The API documentation is available via Swagger. After starting the backend serve
 ```
 http://localhost:4000/api-docs/#
 ```
+
+---
+
+## Usage
+
+1. **Register a new account**
+   - Navigate to `/accounts/register` and fill in the required details.
+   - Submit the registration form.
+   - Check your email for a verification link.
+
+2. **Verify your email**
+   - Click the verification link sent to your inbox.
+   - You will be redirected to a confirmation page.
+
+3. **Log in**
+   - Visit `/accounts/login`.
+   - Enter your credentials and submit the form.
+
+4. **Manage your profile**
+   - Navigate to `/profile` to update personal information.
+   - Change password and security settings.
+
+5. **Admin functionalities**
+   - Admin users can access the dashboard to manage users, roles, and permissions.
+   - Navigate to `/admin/dashboard` for full administrative capabilities.
+
+---
+
+## Testing
+
+To ensure system reliability, various tests have been conducted:
+
+- **Functional Testing**
+  - Validates core functionalities such as registration, login, email verification, and role management.
+  - View the functional testing results: [Link to test cases]
+
+- **Security Testing**
+  - Assesses vulnerabilities like SQL injection, XSS, CSRF protection, and password security.
+  - View the security testing results: [Link to test cases]
 
 ---
 
