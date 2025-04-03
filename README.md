@@ -25,9 +25,9 @@ The **User Management System** is a web-based application designed to streamline
 Built with **Node.js** and **MySQL** for the backend and **Angular** for the frontend, this system ensures a seamless experience for both users and administrators. Key features include JWT authentication, email verification, password recovery, profile management, and an admin dashboard for managing user accounts. Additionally, a fake backend implementation is available to facilitate development and testing without requiring a live backend.
 
 This project is developed by:
-- Marc Lawrence Magadan
-- Jairus Azer Andrade
-- John Clarence Palma
+- **Marc Lawrence Magadan**
+- **Jairus Azer Andrade**
+- **John Clarence Palma**
 
 ---
 
