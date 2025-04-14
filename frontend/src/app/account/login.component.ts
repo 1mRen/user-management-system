@@ -10,6 +10,8 @@ export class LoginComponent implements OnInit {
     form: UntypedFormGroup;
     loading = false;
     submitted = false;
+    isVerificationError = false;
+    userEmail = '';
 
     constructor(
         private formBuilder: UntypedFormBuilder,
@@ -31,6 +33,7 @@ export class LoginComponent implements OnInit {
 
     onSubmit() {
         this.submitted = true;
+        this.isVerificationError = false;
 
         // reset alerts on submit
         this.alertService.clear();
@@ -41,13 +44,36 @@ export class LoginComponent implements OnInit {
         }
 
         this.loading = true;
-        this.accountService.login(this.f.email.value, this.f.password.value)
+        this.userEmail = this.f['email'].value;
+        
+        this.accountService.login(this.userEmail, this.f['password'].value)
             .pipe(first())
             .subscribe({
                 next: () => {
                     // get return url from query parameters or default to home page
                     const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
                     this.router.navigateByUrl(returnUrl);
+                },
+                error: error => {
+                    // Check if this is a verification error
+                    if (error === 'Please verify your email before logging in') {
+                        this.isVerificationError = true;
+                    }
+                    
+                    this.alertService.error(error);
+                    this.loading = false;
+                }
+            });
+    }
+    
+    resendVerificationEmail() {
+        this.loading = true;
+        this.accountService.resendVerificationEmail(this.userEmail)
+            .pipe(first())
+            .subscribe({
+                next: () => {
+                    this.alertService.success('Verification email sent, please check your inbox');
+                    this.loading = false;
                 },
                 error: error => {
                     this.alertService.error(error);

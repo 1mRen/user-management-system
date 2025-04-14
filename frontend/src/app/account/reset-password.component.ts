@@ -42,17 +42,20 @@ export class ResetPasswordComponent implements OnInit {
         // remove token from query params to prevent http referer leakage
         this.router.navigate([], { relativeTo: this.route, replaceUrl: true });
 
-        this.accountService.validateResetToken(this.token)
-            .pipe(first())
-            .subscribe({
-                next: () => {
-                    this.token = token;
-                    this.tokenStatus = TokenStatus.Valid;
-                },
-                error: () => {
-                    this.tokenStatus = TokenStatus.Invalid;
-                }
-            });
+        if (this.token) {
+            this.accountService.validateResetToken(this.token)
+                .pipe(first())
+                .subscribe({
+                    next: () => {
+                        this.tokenStatus = TokenStatus.Valid;
+                    },
+                    error: () => {
+                        this.tokenStatus = TokenStatus.Invalid;
+                    }
+                });
+        } else {
+            this.tokenStatus = TokenStatus.Invalid;
+        }
     }
 
     // convenience getter for easy access to form fields
@@ -70,7 +73,7 @@ export class ResetPasswordComponent implements OnInit {
         }
 
         this.loading = true;
-        this.accountService.resetPassword(this.token, this.f.password.value)
+        this.accountService.resetPassword(this.token!, this.f['password'].value, this.f['confirmPassword'].value)
             .pipe(first())
             .subscribe({
                 next: () => {

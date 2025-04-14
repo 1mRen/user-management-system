@@ -1,4 +1,4 @@
-import { Component, OnInit, Ondestory, Input} from '@angular/core';
+import { Component, OnInit, OnDestroy, Input} from '@angular/core';
 import { Router, NavigationStart} from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -6,7 +6,7 @@ import { Alert, AlertType } from '@app/_models';
 import { AlertService } from '@app/_services';
 
 @Component({ selector: 'alert', templateUrl: 'alert.component.html' })
-export class AlertComponent implements OnInit, Ondestory {
+export class AlertComponent implements OnInit, OnDestroy {
     @Input() id = 'default-alert';
     @Input() fade = true; // fade alert on close
 
@@ -16,7 +16,7 @@ export class AlertComponent implements OnInit, Ondestory {
 
     constructor(private router: Router, private alertService: AlertService) { }
     
-    gOnInt() {
+    ngOnInit() {
         // subscribe to new alert notifications
         this.alertSubscription = this.alertService.onAlert(this.id)
             .subscribe(alert => {
@@ -59,7 +59,7 @@ export class AlertComponent implements OnInit, Ondestory {
 
             if (this.fade) {
                 // fade out alert
-                alert
+                alert.fade = true;
 
                 //remove alert after faded out
                 setTimeout(() => {

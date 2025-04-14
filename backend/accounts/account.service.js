@@ -20,13 +20,26 @@ module.exports = {
   getById,
   create,
   update,
+  logout,
+  resendVerificationEmail,
   delete: _delete
 };
 
 async function authenticate({ email, password, ipAddress }) {
   const account = await db.Account.scope('withHash').findOne({ where: { email } });
 
-  if (!account || !account.isVerified || !(await bcrypt.compare(password, account.passwordHash))) {
+  // First check if account exists
+  if (!account) {
+    throw 'Email or password is incorrect';
+  }
+  
+  // Then check if account is verified
+  if (!account.isVerified) {
+    throw 'Please verify your email before logging in';
+  }
+  
+  // Finally check password
+  if (!(await bcrypt.compare(password, account.passwordHash))) {
     throw 'Email or password is incorrect';
   }
 
@@ -275,4 +288,24 @@ async function sendPasswordResetEmail(account, origin){
     html: `<h4>Reset Password Email</h4>
            ${message}`
   });
+}
+
+async function resendVerificationEmail({ email }, origin) {
+  const account = await db.Account.findOne({ where: { email } });
+  
+  // Only send verification email if account exists and is not verified
+  if (account && !account.isVerified) {
+      // Generate a new verification token
+      account.verificationToken = randomTokenString();
+      await account.save();
+      
+      // Send the verification email
+      await sendVerificationEmail(account, origin);
+      return;
+  }
+}
+
+async function logout({ token, ipAddress }) {
+  // Simply revoke the token
+  await revokeToken({ token, ipAddress });
 }

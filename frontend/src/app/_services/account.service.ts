@@ -7,23 +7,23 @@ import { map, finalize } from 'rxjs/operators';
 import { environment } from '@environments/environment';
 import { Account } from '@app/_models';
 
-const baseUrl = `${environment.apiUrl}/account`;
+const baseUrl = `${environment.apiUrl}/accounts`;
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {
-    private accountSubject: BehaviorSubject<Account>;
-    public account: Observable<Account>;
+    private accountSubject: BehaviorSubject<Account | null>;
+    public account: Observable<Account | null>;
 
     constructor(
         private router: Router,
         private http: HttpClient
     ) {
-        this.accountSubject = new BehaviorSubject<Account>(null);
+        this.accountSubject = new BehaviorSubject<Account | null>(null);
         this.account = this.accountSubject.asObservable();
     }
 
     public get accountValue(): Account {
-        return this.accountSubject.value;
+        return this.accountSubject.value!;
     }
 
     login(email: string, password: string) {
@@ -36,10 +36,21 @@ export class AccountService {
     }
 
     logout() {
-        this.http.post(`${baseUrl}/logout`, {}, { withCredentials: true }).subscribe();
-        this.stopRefreshTokenTimer();
-        this.accountSubject.next(null);
-        this.router.navigate(['/account/login']);
+        this.http.post(`${baseUrl}/logout`, {}, { withCredentials: true })
+            .pipe(
+                finalize(() => {
+                    // These actions will run regardless of success/failure
+                    this.stopRefreshTokenTimer();
+                    this.accountSubject.next(null);
+                    this.router.navigate(['/account/login']); // Check if this path is correct
+                })
+            )
+            .subscribe({
+                error: error => {
+                    console.error('Logout error:', error);
+                    // Still proceed with local logout even if API call fails
+                }
+            });
     }
 
     refreshToken() {
@@ -79,12 +90,13 @@ export class AccountService {
         return this.http.get<Account>(`${baseUrl}/${id}`);
     }
 
-    create(params) {
+    create(params: Partial<Account>) {
         return this.http.post(baseUrl, params);
-    }
-    
-    update(id: string, params) {
+      }
+      
+    update(id: string, params: Partial<Account>) {
         return this.http.put(`${baseUrl}/${id}`, params)
+      
             .pipe(map((account: any) => {
                 // update the current accoutn if it was updated
                 if (account.id === this.accountValue.id) {
@@ -105,18 +117,25 @@ export class AccountService {
             }));
     }
 
+    // Add this to account.service.ts
+    resendVerificationEmail(email: string) {
+        return this.http.post(`${baseUrl}/resend-verification-email`, { email });
+    }
+
     //helper methods
 
-    private refreshTokenTimeout;
+    private refreshTokenTimeout: ReturnType<typeof setTimeout>;
+
 
     private startRefreshTokenTimer() {
         // parse json object from base64 encoded jwt token
+        if (!this.accountValue?.jwtToken) return;
+        
         const jwtToken = JSON.parse(atob(this.accountValue.jwtToken.split('.')[1]));
         
         // set a timeout to refresh the token a minute before it expires
-        const expires = new Date(jwtToken.exp * 1000);
         const expiresIn = jwtToken.exp * 1000 - Date.now() - (60 * 1000);
-        this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), timeout);
+        this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), expiresIn);
     }
 
     private stopRefreshTokenTimer() {
