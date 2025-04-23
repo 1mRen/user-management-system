@@ -16,11 +16,9 @@
 			<td>{{ account.email }}</td>
 			<td>{{ account.role }}</td>
 			<td style="white-space: nowrap">
-				<a [routerLink]="['edit', account.id]" class="btn btn-sm btn-primary mr-1"
-					>Edit</a
-				>
+				<a [routerLink]="['edit', account.id]" class="btn btn-sm btn-primary mr-1">Edit</a>
 				<button
-					(click)="deleteAccount(account.id)"
+					z(click)="deleteAccount(account.id)"
 					class="btn btn-sm btn-danger btn-delete-account"
 					[disabled]="account.isDeleting">
 					<span
