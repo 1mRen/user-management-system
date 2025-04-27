@@ -7,7 +7,7 @@ const Role = require('_helpers/role');
 const accountService = require('./account.service');
 
 // routes
-router.post('/authenticate', authenticateSchema, authenticate);
+router.post('/login', authenticateSchema, authenticate);
 router.post('/refresh-token', refreshToken);
 router.post('/revoke-token', authorize(), revokeTokenSchema, revokeToken);
 router.post('/register', registerSchema, register);
@@ -15,11 +15,14 @@ router.post('/verify-email', verifyEmailSchema, verifyEmail);
 router.post('/forgot-password', forgotPasswordSchema, forgotPassword);
 router.post('/validate-reset-token', validateResetTokenSchema, validateResetToken);
 router.post('/reset-password', resetPasswordSchema, resetPassword);
+router.post('/resend-verification-email', resendVerificationEmailSchema, resendVerificationEmail);
+router.post('/logout', authorize(), logout);
 router.get('/', authorize(Role.Admin), getAll);
 router.get('/:id', authorize(), getById);
 router.post('/', authorize(Role.Admin), createSchema, create);
 router.put('/:id', authorize(), updateSchema, update);
 router.delete('/:id', authorize(), _delete);
+
 
 module.exports = router;
 
@@ -169,6 +172,21 @@ function getById(req, res, next) {
       .catch(next);
 }
 
+function resendVerificationEmailSchema(req, res, next) {
+  const schema = Joi.object({
+    email: Joi.string().email().required()
+  });
+  validateRequest(req, next, schema);
+}
+
+function resendVerificationEmail(req, res, next) {
+  accountService.resendVerificationEmail(req.body, req.get('origin'))
+    .then(() => res.json({ 
+      message: 'If your email is registered and unverified, a new verification email has been sent' 
+    }))
+    .catch(next);
+}
+
 function createSchema(req, res, next) {
   const schema = Joi.object({
       title: Joi.string().required(),
@@ -238,4 +256,23 @@ function setTokenCookie(res, token) {
       expires: new Date(Date.now() + 7*24*60*60*1000)
   };
   res.cookie('refreshToken', token, cookieOptions);
+}
+
+
+function logout(req, res, next) {
+  // Get token from cookie since you're using { withCredentials: true }
+  const token = req.cookies.refreshToken;
+  const ipAddress = req.ip;
+  
+  if (!token) {
+      return res.status(400).json({ message: 'Token is required' });
+  }
+  
+  accountService.logout({ token, ipAddress })
+      .then(() => {
+          // Clear the refresh token cookie
+          res.clearCookie('refreshToken');
+          res.json({ message: 'Logout successful' });
+      })
+      .catch(next);
 }
