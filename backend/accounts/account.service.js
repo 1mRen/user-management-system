@@ -106,15 +106,15 @@ async function register(params, origin) {
 }
 
 async function verifyEmail() {
-  //async function verifyEmail({ token }) {
-  // const account = await db.Account.findOne({ where: { verificationToken: token } });
-  const account = await db.Account.findOne({
+  async function verifyEmail({ token }) {
+   const account = await db.Account.findOne({ where: { verificationToken: token } });
+ /* const account = await db.Account.findOne({
     where: {
       verificationToken: { [Op.ne]: null },
       verified: null
     },
     order: [['created', 'DESC']]
-  });
+  });*/
   
   if (!account) throw 'Verification failed, token is invalid or expired';
   account.verified = Date.now();
