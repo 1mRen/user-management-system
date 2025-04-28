@@ -22,6 +22,7 @@ module.exports = {
   update,
   logout,
   resendVerificationEmail,
+  updateAccountStatus,
   delete: _delete
 };
 
@@ -31,6 +32,11 @@ async function authenticate({ email, password, ipAddress }) {
   // First check if account exists
   if (!account) {
     throw 'Email or password is incorrect';
+  }
+  
+  // Then check if account is active
+  if (!account.isActive) {
+    throw 'This account has been deactivated. Please contact an administrator.';
   }
   
   // Then check if account is verified
@@ -118,8 +124,7 @@ async function register(params, origin) {
   await sendVerificationEmail(account, origin);
 }
 
-async function verifyEmail() {
-  async function verifyEmail({ token }) {
+async function verifyEmail({ token }) {
    const account = await db.Account.findOne({ where: { verificationToken: token } });
  /* const account = await db.Account.findOne({
     where: {
@@ -180,6 +185,7 @@ async function create(params) {
 
   const account = new db.Account(params);
   account.verified = Date.now();
+  account.isActive = true; // Set default to true for new accounts
   account.passwordHash = await hash(params.password);
   await account.save();
 
@@ -239,8 +245,8 @@ function randomTokenString() {
 }
 
 function basicDetails(account) {
-  const { id, email, firstName, lastName, role, created, updated, isVerified } = account;
-  return { id, email, firstName, lastName, role, created, updated, isVerified };
+  const { id, email, firstName, lastName, role, created, updated, isVerified, isActive } = account;
+  return { id, email, firstName, lastName, role, created, updated, isVerified, isActive };
 }
 
 async function sendVerificationEmail(account, origin) {
@@ -317,4 +323,18 @@ async function resendVerificationEmail({ email }, origin) {
 async function logout({ token, ipAddress }) {
   // Simply revoke the token
   await revokeToken({ token, ipAddress });
+}
+
+async function updateAccountStatus(id, { isActive }) {
+  const account = await getAccount(id);
+
+  // Prevent deactivating any admin account
+  if (!isActive && account.role === Role.Admin) {
+    throw 'Cannot deactivate an admin account';
+  }
+
+  account.isActive = isActive;
+  account.updated = Date.now();
+  await account.save();
+  return basicDetails(account);
 }

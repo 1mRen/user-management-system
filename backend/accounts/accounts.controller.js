@@ -17,6 +17,7 @@ router.post('/validate-reset-token', validateResetTokenSchema, validateResetToke
 router.post('/reset-password', resetPasswordSchema, resetPassword);
 router.post('/resend-verification-email', resendVerificationEmailSchema, resendVerificationEmail);
 router.post('/logout', authorize(), logout);
+router.patch('/:id/status', authorize(Role.Admin), updateAccountStatusSchema, updateAccountStatus);
 router.get('/', authorize(Role.Admin), getAll);
 router.get('/:id', authorize(), getById);
 router.post('/', authorize(Role.Admin), createSchema, create);
@@ -245,6 +246,24 @@ function _delete(req, res, next) {
   accountService.delete(req.params.id)
       .then(() => res.json({ message: 'Account deleted successfully' }))
       .catch(next);
+}
+
+function updateAccountStatusSchema(req, res, next) {
+  const schema = Joi.object({
+    isActive: Joi.boolean().required()
+  });
+  validateRequest(req, next, schema);
+}
+
+function updateAccountStatus(req, res, next) {
+  // only admins can update account status
+  if (req.user.role !== Role.Admin) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  accountService.updateAccountStatus(req.params.id, req.body)
+    .then(account => res.json(account))
+    .catch(next);
 }
 
 // helper functions

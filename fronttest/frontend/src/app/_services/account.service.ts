@@ -98,7 +98,7 @@ export class AccountService {
         return this.http.put(`${baseUrl}/${id}`, params)
       
             .pipe(map((account: any) => {
-                // update the current account if it was updated
+                // update the current accoutn if it was updated
                 if (account.id === this.accountValue.id) {
                     // publish updated account to subscribers
                     account = { ...this.accountValue, ...account };
@@ -121,10 +121,6 @@ export class AccountService {
     resendVerificationEmail(email: string) {
         return this.http.post(`${baseUrl}/resend-verification-email`, { email });
     }
-    
-    updateStatus(id: string, isActive: boolean) {
-        return this.http.patch(`${environment.apiUrl}/accounts/${id}/status`, { isActive });
-    }
 
     //helper methods
 
@@ -146,3 +142,4 @@ export class AccountService {
         clearTimeout(this.refreshTokenTimeout);
     }
 }
+
