@@ -20,13 +20,32 @@ module.exports = {
   getById,
   create,
   update,
+  logout,
+  resendVerificationEmail,
+  updateAccountStatus,
   delete: _delete
 };
 
 async function authenticate({ email, password, ipAddress }) {
   const account = await db.Account.scope('withHash').findOne({ where: { email } });
 
-  if (!account || !account.isVerified || !(await bcrypt.compare(password, account.passwordHash))) {
+  // First check if account exists
+  if (!account) {
+    throw 'Email or password is incorrect';
+  }
+  
+  // Then check if account is active
+  if (!account.isActive) {
+    throw 'This account has been deactivated. Please contact an administrator.';
+  }
+  
+  // Then check if account is verified
+  if (!account.isVerified) {
+    throw 'Please verify your email before logging in';
+  }
+  
+  // Finally check password
+  if (!(await bcrypt.compare(password, account.passwordHash))) {
     throw 'Email or password is incorrect';
   }
 
@@ -106,7 +125,15 @@ async function register(params, origin) {
 }
 
 async function verifyEmail({ token }) {
-  const account = await db.Account.findOne({ where: { verificationToken: token } });
+   const account = await db.Account.findOne({ where: { verificationToken: token } });
+ /* const account = await db.Account.findOne({
+    where: {
+      verificationToken: { [Op.ne]: null },
+      verified: null
+    },
+    order: [['created', 'DESC']]
+  });*/
+  
   if (!account) throw 'Verification failed, token is invalid or expired';
   account.verified = Date.now();
   account.verificationToken = null;
@@ -158,6 +185,7 @@ async function create(params) {
 
   const account = new db.Account(params);
   account.verified = Date.now();
+  account.isActive = true; // Set default to true for new accounts
   account.passwordHash = await hash(params.password);
   await account.save();
 
@@ -217,8 +245,8 @@ function randomTokenString() {
 }
 
 function basicDetails(account) {
-  const { id, email, firstName, lastName, role, created, updated, isVerified } = account;
-  return { id, email, firstName, lastName, role, created, updated, isVerified };
+  const { id, email, firstName, lastName, role, created, updated, isVerified, isActive } = account;
+  return { id, email, firstName, lastName, role, created, updated, isVerified, isActive };
 }
 
 async function sendVerificationEmail(account, origin) {
@@ -275,4 +303,38 @@ async function sendPasswordResetEmail(account, origin){
     html: `<h4>Reset Password Email</h4>
            ${message}`
   });
+}
+
+async function resendVerificationEmail({ email }, origin) {
+  const account = await db.Account.findOne({ where: { email } });
+  
+  // Only send verification email if account exists and is not verified
+  if (account && !account.isVerified) {
+      // Generate a new verification token
+      account.verificationToken = randomTokenString();
+      await account.save();
+      
+      // Send the verification email
+      await sendVerificationEmail(account, origin);
+      return;
+  }
+}
+
+async function logout({ token, ipAddress }) {
+  // Simply revoke the token
+  await revokeToken({ token, ipAddress });
+}
+
+async function updateAccountStatus(id, { isActive }) {
+  const account = await getAccount(id);
+
+  // Prevent deactivating any admin account
+  if (!isActive && account.role === Role.Admin) {
+    throw 'Cannot deactivate an admin account';
+  }
+
+  account.isActive = isActive;
+  account.updated = Date.now();
+  await account.save();
+  return basicDetails(account);
 }
