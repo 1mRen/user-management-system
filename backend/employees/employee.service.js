@@ -36,33 +36,59 @@ async function create(params) {
     if (params.accountId && await db.Employee.findOne({ where: { accountId: params.accountId, isActive: true } })) {
         throw 'Account already has an employee record';
     }
-
+    
     // Validate department exists
     const department = await db.Department.findByPk(params.departmentId);
     if (!department || !department.isActive) throw 'Department not found';
-
+    
     // Create employee
     const employee = await db.Employee.create({
         ...params,
         startDate: params.startDate || new Date()
     });
-
+    
+    // Create onboarding workflow if specified
+    if (params.createOnboarding) {
+        await db.Workflow.create({
+            employeeId: employee.id,
+            type: 'Onboarding',
+            details: {
+                task: "Setup workstation"
+            },
+            status: 'Pending'
+        });
+    }
+    
     return await getById(employee.id);
 }
 
 async function update(id, params) {
     const employee = await getById(id);
-
+    
     // Validate department if being changed
     if (params.departmentId && employee.departmentId !== params.departmentId) {
         const department = await db.Department.findByPk(params.departmentId);
         if (!department || !department.isActive) throw 'Department not found';
     }
-
+    
     // Update employee
     Object.assign(employee, params, { updated: new Date() });
     await employee.save();
-
+    
+    // Create promotion workflow if position is changing
+    if (params.position && employee.position !== params.position) {
+        await db.Workflow.create({
+            employeeId: employee.id,
+            type: 'Promotion',
+            details: {
+                oldPosition: employee.position,
+                newPosition: params.position,
+                reason: params.reason || 'Position change'
+            },
+            status: 'Completed'
+        });
+    }
+    
     return await getById(id);
 }
 
@@ -72,6 +98,21 @@ async function _delete(id) {
     // Soft delete by setting isActive to false
     Object.assign(employee, { isActive: false, updated: new Date() });
     await employee.save();
+    
+    // Create offboarding workflow
+    await db.Workflow.create({
+        employeeId: employee.id,
+        type: 'Offboarding',
+        details: {
+            reason: 'Employee deactivated',
+            tasks: [
+                { name: 'Revoke access', completed: false },
+                { name: 'Collect company property', completed: false },
+                { name: 'Exit interview', completed: false }
+            ]
+        },
+        status: 'Pending'
+    });
 }
 
 async function transferEmployee(id, params) {
@@ -80,23 +121,26 @@ async function transferEmployee(id, params) {
     // Validate department exists
     const department = await db.Department.findByPk(params.departmentId);
     if (!department || !department.isActive) throw 'Department not found';
-
+    
+    // Store old department for workflow
+    const oldDepartmentId = employee.departmentId;
+    
     // Update employee department
     employee.departmentId = params.departmentId;
     employee.updated = new Date();
     await employee.save();
-
+    
     // Create transfer workflow
     await db.Workflow.create({
         employeeId: id,
-        type: 'transfer',
-        status: 'completed',
+        type: 'Transfer',
+        status: 'Completed',
         details: {
-            oldDepartmentId: employee.departmentId,
+            oldDepartmentId: oldDepartmentId,
             newDepartmentId: params.departmentId,
             reason: params.reason || 'Department transfer'
         }
     });
-
+    
     return await getById(id);
 }

@@ -28,11 +28,10 @@ app.use(cors({
 
 // API routes
 app.use('/accounts', require('./accounts/accounts.controller'));
-app.use('/departments', require('./departments/index'));
-app.use('/employees', require('./employees/index'));
-app.use('/request', require('./request/index'));
-app.use('/workflows', require('./workflows/index'));
-
+app.use('/departments', require('./departments/departments.controller'));
+app.use('/employees', require('./employees/employees.controller'));
+app.use('/requests', require('./request/requests.controller'));
+app.use('/workflows', require('./workflows/workflows.controller'));
 // Swagger docs route
 app.use('/api-docs', require('_helpers/swagger'));
 

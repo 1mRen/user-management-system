@@ -20,8 +20,8 @@ function createSchema(req, res, next) {
     const schema = Joi.object({
         name: Joi.string().required(),
         description: Joi.string(),
-        code: Joi.string(),
         managerId: Joi.number(),
+        code: Joi.string(),
         location: Joi.string()
     });
     validateRequest(req, next, schema);
@@ -31,10 +31,9 @@ function updateSchema(req, res, next) {
     const schema = Joi.object({
         name: Joi.string(),
         description: Joi.string(),
+        managerId: Joi.number().allow(null),
         code: Joi.string(),
-        managerId: Joi.number(),
-        location: Joi.string(),
-        isActive: Joi.boolean()
+        location: Joi.string()
     });
     validateRequest(req, next, schema);
 }

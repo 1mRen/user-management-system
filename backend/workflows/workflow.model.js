@@ -1,34 +1,34 @@
 const { DataTypes } = require('sequelize');
+
 module.exports = model;
 
 function model(sequelize) {
   const attributes = {
     employeeId: { type: DataTypes.INTEGER, allowNull: false },
     type: { 
-      type: DataTypes.ENUM, 
-      values: ['onboarding', 'offboarding', 'promotion', 'transfer', 'other'],
+      type: DataTypes.STRING, 
       allowNull: false 
     },
     status: { 
-      type: DataTypes.ENUM, 
-      values: ['pending', 'in_progress', 'completed', 'cancelled'],
+      type: DataTypes.STRING,
       defaultValue: 'pending',
       allowNull: false 
     },
-    startDate: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
-    endDate: { type: DataTypes.DATE },
     details: { type: DataTypes.JSON },
-    notes: { type: DataTypes.TEXT },
     assignedTo: { type: DataTypes.INTEGER },
-    created: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
-    updated: { type: DataTypes.DATE }
+    created: { 
+      type: DataTypes.DATE, 
+      allowNull: false, 
+      defaultValue: DataTypes.NOW 
+    },
+    updated: { 
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    }
   };
 
   const options = {
-    timestamps: false,
-    defaultScope: {
-      attributes: {}
-    }
+    timestamps: false
   };
 
   return sequelize.define('workflow', attributes, options);

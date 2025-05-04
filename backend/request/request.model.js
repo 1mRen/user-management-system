@@ -1,5 +1,4 @@
 const { DataTypes } = require('sequelize');
-module.exports = model;
 
 function model(sequelize) {
   const attributes = {
@@ -40,3 +39,5 @@ function model(sequelize) {
 
   return sequelize.define('request', attributes, options);
 }
+
+module.exports = model;

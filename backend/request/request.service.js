@@ -80,6 +80,22 @@ async function create(params) {
 
     // Create request
     const request = await db.Request.create(params);
+    
+    // Create workflow for certain request types that require workflow tracking
+    if (['promotion', 'transfer', 'equipment', 'leave'].includes(params.type?.toLowerCase())) {
+        await db.Workflow.create({
+            employeeId: params.employeeId,
+            type: `Request: ${params.type}`,
+            status: 'Pending',
+            details: {
+                requestId: request.id,
+                requestType: params.type,
+                requestDate: new Date(),
+                description: params.description || params.reason || 'New request'
+            }
+        });
+    }
+    
     return await getById(request.id);
 }
 
@@ -92,6 +108,34 @@ async function update(id, params) {
     // If status is changed to completed, set completion date
     if (params.status === 'completed' && request.status !== 'completed') {
         request.completionDate = new Date();
+        
+        // Update associated workflow if it exists
+        const workflow = await db.Workflow.findOne({
+            where: {
+                employeeId: request.employeeId,
+                details: { requestId: request.id }
+            }
+        });
+        
+        if (workflow) {
+            workflow.status = 'Completed';
+            workflow.updated = new Date();
+            await workflow.save();
+        }
+    } else if (params.status === 'rejected' && request.status !== 'rejected') {
+        // Update associated workflow if it exists
+        const workflow = await db.Workflow.findOne({
+            where: {
+                employeeId: request.employeeId,
+                details: { requestId: request.id }
+            }
+        });
+        
+        if (workflow) {
+            workflow.status = 'Cancelled';
+            workflow.updated = new Date();
+            await workflow.save();
+        }
     }
     
     await request.save();
@@ -100,5 +144,20 @@ async function update(id, params) {
 
 async function _delete(id) {
     const request = await getById(id);
+    
+    // Find and update associated workflow if it exists
+    const workflow = await db.Workflow.findOne({
+        where: {
+            employeeId: request.employeeId,
+            details: { requestId: request.id }
+        }
+    });
+    
+    if (workflow) {
+        workflow.status = 'Cancelled';
+        workflow.updated = new Date();
+        await workflow.save();
+    }
+    
     await request.destroy();
 }
