@@ -3,9 +3,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { Op } = require('sequelize');
-const sendEmail = require ('_helpers/send-email');
+const sendEmail = require('_helpers/send-email');
 const db = require('_helpers/db');
 const Role = require('_helpers/role');
+const workflowService = require('./workflow.service');
 
 module.exports = {
   authenticate,
@@ -108,7 +109,6 @@ async function sendVerificationEmail(account, origin) {
   });
 }
 
-
 async function register(params, origin) {
   if (await db.Account.findOne({ where: { email: params.email } })) {
     return await sendAlreadyRegisteredEmail(params.email, origin);
@@ -121,21 +121,43 @@ async function register(params, origin) {
   account.passwordHash = await hash(params.password);
 
   await account.save();
+  
+  // If this account registration includes employee details, create an employee record
+  if (params.createEmployee && params.employeeDetails) {
+    const employee = await db.Employee.create({
+      accountId: account.id,
+      firstName: account.firstName,
+      lastName: account.lastName,
+      email: account.email,
+      departmentId: params.employeeDetails.departmentId,
+      position: params.employeeDetails.position || 'New Hire',
+      startDate: params.employeeDetails.startDate || new Date(),
+      isActive: true
+    });
+    
+    // Create onboarding workflow for the new employee
+    await workflowService.initiateOnboarding({
+      employeeId: employee.id,
+      details: {
+        tasks: [
+          { name: 'Setup workstation', completed: false },
+          { name: 'Assign email account', completed: false },
+          { name: 'Security access', completed: false },
+          { name: 'Department orientation', completed: false }
+        ]
+      }
+    });
+  }
+  
   await sendVerificationEmail(account, origin);
 }
 
 async function verifyEmail({ token }) {
    const account = await db.Account.findOne({ where: { verificationToken: token } });
- /* const account = await db.Account.findOne({
-    where: {
-      verificationToken: { [Op.ne]: null },
-      verified: null
-    },
-    order: [['created', 'DESC']]
-  });*/
   
   if (!account) throw 'Verification failed, token is invalid or expired';
   account.verified = Date.now();
+  account.isVerified = true; // Make sure isVerified is set to true
   account.verificationToken = null;
   await account.save();
 }
@@ -185,9 +207,39 @@ async function create(params) {
 
   const account = new db.Account(params);
   account.verified = Date.now();
+  account.isVerified = true;
   account.isActive = true; // Set default to true for new accounts
   account.passwordHash = await hash(params.password);
   await account.save();
+  
+  // If this account will be linked to an employee, create an employee record and onboarding workflow
+  if (params.createEmployee && params.employeeDetails) {
+    const employee = await db.Employee.create({
+      accountId: account.id,
+      firstName: account.firstName,
+      lastName: account.lastName,
+      email: account.email,
+      departmentId: params.employeeDetails.departmentId,
+      position: params.employeeDetails.position || 'New Hire',
+      startDate: params.employeeDetails.startDate || new Date(),
+      isActive: true
+    });
+    
+    // Create onboarding workflow for new employee
+    await workflowService.create({
+      employeeId: employee.id,
+      type: 'Onboarding',
+      status: 'Pending',
+      details: {
+        tasks: [
+          { name: 'Setup workstation', completed: false },
+          { name: 'Assign email account', completed: false },
+          { name: 'Security access', completed: false },
+          { name: 'Department orientation', completed: false }
+        ]
+      }
+    });
+  }
 
   return basicDetails(account);
 }
@@ -203,11 +255,47 @@ async function update(id, params) {
   Object.assign(account, params);
   account.updated = Date.now();
   await account.save();
+  
+  // If account name changed, check for associated employee to update
+  if ((params.firstName && account.firstName !== params.firstName) || 
+      (params.lastName && account.lastName !== params.lastName)) {
+    const employee = await db.Employee.findOne({ where: { accountId: account.id } });
+    if (employee) {
+      if (params.firstName) employee.firstName = params.firstName;
+      if (params.lastName) employee.lastName = params.lastName;
+      await employee.save();
+    }
+  }
+  
   return basicDetails(account);
 }
 
 async function _delete(id) {
   const account = await getAccount(id);
+  
+  // Check if account has an employee record
+  const employee = await db.Employee.findOne({ where: { accountId: account.id } });
+  if (employee) {
+    // Create workflow for offboarding
+    await workflowService.create({
+      employeeId: employee.id,
+      type: 'Offboarding',
+      status: 'Pending',
+      details: {
+        reason: 'Account deleted',
+        tasks: [
+          { name: 'Revoke access', completed: false },
+          { name: 'Collect company property', completed: false },
+          { name: 'Exit interview', completed: false }
+        ]
+      }
+    });
+    
+    // Set employee to inactive
+    employee.isActive = false;
+    await employee.save();
+  }
+  
   await account.destroy();
 }
 
@@ -331,6 +419,56 @@ async function updateAccountStatus(id, { isActive }) {
   // Prevent deactivating any admin account
   if (!isActive && account.role === Role.Admin) {
     throw 'Cannot deactivate an admin account';
+  }
+
+  // If deactivating an account, check for associated employee to trigger offboarding workflow
+  if (!isActive && account.isActive) {
+    const employee = await db.Employee.findOne({ where: { accountId: account.id } });
+    if (employee && employee.isActive) {
+      // Create offboarding workflow
+      await workflowService.create({
+        employeeId: employee.id,
+        type: 'Offboarding',
+        status: 'Pending',
+        details: {
+          reason: 'Account deactivated',
+          tasks: [
+            { name: 'Revoke system access', completed: false },
+            { name: 'Collect company property', completed: false },
+            { name: 'Exit interview', completed: false }
+          ]
+        }
+      });
+      
+      // Update employee status
+      employee.isActive = false;
+      await employee.save();
+    }
+  }
+  
+  // If reactivating an account, check for associated employee to trigger reactivation workflow
+  if (isActive && !account.isActive) {
+    const employee = await db.Employee.findOne({ where: { accountId: account.id } });
+    if (employee && !employee.isActive) {
+      // Create reactivation workflow
+      await workflowService.create({
+        employeeId: employee.id,
+        type: 'Reactivation',
+        status: 'Pending',
+        details: {
+          reason: 'Account reactivated',
+          tasks: [
+            { name: 'Restore system access', completed: false },
+            { name: 'Assign workstation', completed: false },
+            { name: 'Department re-orientation', completed: false }
+          ]
+        }
+      });
+      
+      // Update employee status
+      employee.isActive = true;
+      await employee.save();
+    }
   }
 
   account.isActive = isActive;
