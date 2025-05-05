@@ -5,7 +5,7 @@ function model(sequelize) {
     employeeId: { type: DataTypes.INTEGER, allowNull: false },
     type: { 
       type: DataTypes.ENUM, 
-      values: ['leave', 'transfer', 'promotion', 'equipment', 'other'],
+      values: ['leave', 'equipment', 'resources'],
       allowNull: false 
     },
     title: { type: DataTypes.STRING, allowNull: false },
@@ -15,7 +15,7 @@ function model(sequelize) {
       values: ['pending', 'approved', 'rejected', 'in_progress', 'completed', 'cancelled'],
       defaultValue: 'pending',
       allowNull: false 
-    },
+    },  
     priority: { 
       type: DataTypes.ENUM, 
       values: ['low', 'medium', 'high', 'urgent'],

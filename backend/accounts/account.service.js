@@ -6,7 +6,7 @@ const { Op } = require('sequelize');
 const sendEmail = require('_helpers/send-email');
 const db = require('_helpers/db');
 const Role = require('_helpers/role');
-const workflowService = require('./workflow.service');
+const workflowService = require('../workflows/workflow.service');
 
 module.exports = {
   authenticate,
