@@ -23,7 +23,8 @@ function model(sequelize) {
     },
     updated: { 
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
+      allowNull: true,
+      defaultValue: null
     }
   };
 

@@ -41,14 +41,15 @@ async function create(params) {
     const department = await db.Department.findByPk(params.departmentId);
     if (!department || !department.isActive) throw 'Department not found';
     
-    // Create employee
-    const employee = await db.Employee.create({
-        ...params,
-        startDate: params.startDate || new Date()
-    });
-    
-    // Create onboarding workflow if specified
-    if (params.createOnboarding) {
+    // Use a transaction to ensure both employee and workflow are created
+    const result = await db.sequelize.transaction(async (t) => {
+        // Create employee
+        const employee = await db.Employee.create({
+            ...params,
+            startDate: params.startDate || new Date()
+        }, { transaction: t });
+        
+        // Always create onboarding workflow regardless of params.createOnboarding
         await db.Workflow.create({
             employeeId: employee.id,
             type: 'Onboarding',
@@ -56,10 +57,13 @@ async function create(params) {
                 task: "Setup workstation"
             },
             status: 'Pending'
-        });
-    }
+        }, { transaction: t });
+        
+        return employee;
+    });
     
-    return await getById(employee.id);
+    // Get full employee details
+    return await getById(result.id);
 }
 
 async function update(id, params) {
@@ -107,8 +111,6 @@ async function _delete(id) {
             reason: 'Employee deactivated',
             tasks: [
                 { name: 'Revoke access', completed: false },
-                { name: 'Collect company property', completed: false },
-                { name: 'Exit interview', completed: false }
             ]
         },
         status: 'Pending'
