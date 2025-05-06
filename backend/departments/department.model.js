@@ -11,11 +11,19 @@ function model(sequelize) {
     description: { 
       type: DataTypes.STRING 
     },
-    managerId: {
+    code: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    accountId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
-        model: 'employees',
+        model: 'accounts', // Changed from 'account' to 'accounts'
         key: 'id'
       }
     },

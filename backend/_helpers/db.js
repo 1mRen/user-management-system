@@ -64,6 +64,18 @@ async function initialize() {
             onUpdate: 'CASCADE'
         });
 
+        // Account - Department (One-to-Many)
+        db.Account.hasMany(db.Department, {
+            foreignKey: 'accountId',
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE'
+        });
+        db.Department.belongsTo(db.Account, {
+            foreignKey: 'accountId',
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE'
+        });
+
         // Custom hooks for isActive synchronization between Account and Employee
         db.Account.addHook('afterUpdate', async (account, options) => {
             // If account isActive changed, update the associated employee
@@ -102,10 +114,6 @@ async function initialize() {
         // Employee - Workflow (One-to-Many)
         db.Employee.hasMany(db.Workflow, { foreignKey: 'employeeId' });
         db.Workflow.belongsTo(db.Employee, { foreignKey: 'employeeId' });
-        
-        // Employee - Department (Manager)
-        db.Employee.hasOne(db.Department, { foreignKey: 'managerId', as: 'ManagedDepartment' });
-        db.Department.belongsTo(db.Employee, { foreignKey: 'managerId', as: 'Manager' });
         
         // Approver - Request (One-to-Many)
         db.Employee.hasMany(db.Request, { foreignKey: 'approverId', as: 'ApprovedRequests' });

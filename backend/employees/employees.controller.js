@@ -14,7 +14,7 @@ router.put('/:id', authorize(Role.Admin), updateSchema, update);
 router.delete('/:id', authorize(Role.Admin), _delete);
 router.post('/:id/transfer', authorize(Role.Admin), transferSchema, transfer);
 
-module.exports = router;
+module.exports = router;    
 
 // Schema validation rules
 function createSchema(req, res, next) {

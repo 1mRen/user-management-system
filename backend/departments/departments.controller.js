@@ -20,9 +20,9 @@ function createSchema(req, res, next) {
     const schema = Joi.object({
         name: Joi.string().required(),
         description: Joi.string(),
-        managerId: Joi.number(),
         code: Joi.string(),
-        location: Joi.string()
+        location: Joi.string(),
+        accountId: Joi.number().integer()
     });
     validateRequest(req, next, schema);
 }
@@ -31,9 +31,9 @@ function updateSchema(req, res, next) {
     const schema = Joi.object({
         name: Joi.string(),
         description: Joi.string(),
-        managerId: Joi.number().allow(null),
         code: Joi.string(),
-        location: Joi.string()
+        location: Joi.string(),
+        accountId: Joi.number().integer()
     });
     validateRequest(req, next, schema);
 }
@@ -41,7 +41,17 @@ function updateSchema(req, res, next) {
 // Controller functions
 async function create(req, res, next) {
     try {
-        const department = await departmentService.create(req.body);
+        // If accountId is not provided, use the authenticated user's account ID
+        const params = { ...req.body };
+        if (!params.accountId && req.user) {
+            params.accountId = req.user.accountId || req.user.id;
+        }
+        
+        if (!params.accountId) {
+            return res.status(400).json({ message: "Account ID is required" });
+        }
+        
+        const department = await departmentService.create(params);
         return res.json(department);
     } catch (error) {
         next(error);
@@ -68,7 +78,13 @@ async function getById(req, res, next) {
 
 async function update(req, res, next) {
     try {
-        const department = await departmentService.update(req.params.id, req.body);
+        // If accountId is not provided, use the authenticated user's account ID
+        const params = { ...req.body };
+        if (params.accountId === undefined && req.user) {
+            params.accountId = req.user.accountId || req.user.id;
+        }
+        
+        const department = await departmentService.update(req.params.id, params);
         return res.json(department);
     } catch (error) {
         next(error);
