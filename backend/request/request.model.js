@@ -4,9 +4,7 @@ function model(sequelize) {
   const attributes = {
     employeeId: { type: DataTypes.INTEGER, allowNull: false },
     type: { 
-      type: DataTypes.ENUM, 
-      values: ['leave', 'equipment', 'resources'],
-      allowNull: false 
+      type: DataTypes.STRING,allowNull: false 
     },
     title: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.TEXT },
