@@ -9,7 +9,26 @@ module.exports = {
     delete: _delete
 };
 
-V
+async function getAll() {
+    return await db.Request.findAll({
+        include: [
+            { 
+                model: db.Employee,
+                include: [
+                    { model: db.Account, attributes: ['id', 'firstName', 'lastName', 'email'] }
+                ]
+            },
+            {
+                model: db.Employee, 
+                as: 'Approver',
+                include: [
+                    { model: db.Account, attributes: ['id', 'firstName', 'lastName', 'email'] }
+                ]
+            }
+        ],
+        order: [['createdAt', 'DESC']]
+    });
+}
 
 async function getById(id) {
     const request = await db.Request.findByPk(id, {

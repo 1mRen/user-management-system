@@ -673,6 +673,23 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Department"
+              example:
+                - id: 1
+                  name: "IT Department"
+                  description: "Handles IT operations"
+                  code: "IT"
+                  location: "Floor 3"
+                  accountId: 1
+                  createdAt: "2024-06-01T12:00:00Z"
+                  updatedAt: "2024-06-01T12:00:00Z"
+                - id: 2
+                  name: "HR Department"
+                  description: "Handles HR operations"
+                  code: "HR"
+                  location: "Floor 2"
+                  accountId: 2
+                  createdAt: "2024-06-01T12:00:00Z"
+                  updatedAt: "2024-06-01T12:00:00Z"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     post:
@@ -687,6 +704,12 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateDepartmentRequest"
+            example:
+              name: "IT Department"
+              description: "Handles IT operations"
+              code: "IT"
+              location: "Floor 3"
+              accountId: 1
       responses:
         "200":
           description: Department created successfully
@@ -694,6 +717,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Department"
+              example:
+                id: 1
+                name: "IT Department"
+                description: "Handles IT operations"
+                code: "IT"
+                location: "Floor 3"
+                accountId: 1
+                createdAt: "2024-06-01T12:00:00Z"
+                updatedAt: "2024-06-01T12:00:00Z"
         "400":
           description: Invalid input
         "401":
@@ -719,6 +751,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Department"
+              example:
+                id: 1
+                name: "IT Department"
+                description: "Handles IT operations"
+                code: "IT"
+                location: "Floor 3"
+                accountId: 1
+                createdAt: "2024-06-01T12:00:00Z"
+                updatedAt: "2024-06-01T12:00:00Z"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -735,6 +776,12 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/UpdateDepartmentRequest"
+            example:
+              name: "IT Department Updated"
+              description: "Handles IT operations and support"
+              code: "IT"
+              location: "Floor 4"
+              accountId: 1
       responses:
         "200":
           description: Department updated successfully
@@ -742,6 +789,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Department"
+              example:
+                id: 1
+                name: "IT Department Updated"
+                description: "Handles IT operations and support"
+                code: "IT"
+                location: "Floor 4"
+                accountId: 1
+                createdAt: "2024-06-01T12:00:00Z"
+                updatedAt: "2024-06-02T12:00:00Z"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -763,6 +819,8 @@ paths:
                   message:
                     type: string
                     example: "Department deleted successfully"
+              example:
+                message: "Department deleted successfully"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
