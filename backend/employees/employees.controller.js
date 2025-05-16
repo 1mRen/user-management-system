@@ -24,9 +24,7 @@ function createSchema(req, res, next) {
         position: Joi.string().required(),
         departmentId: Joi.number().required(),
         startDate: Joi.date().default(new Date()),
-        salary: Joi.number(),
-        employeeNumber: Joi.string(),
-        manager: Joi.boolean()
+        employeeNumber: Joi.string()
     });
     validateRequest(req, next, schema);
 }
@@ -35,9 +33,7 @@ function updateSchema(req, res, next) {
     const schema = Joi.object({
         position: Joi.string(),
         departmentId: Joi.number(),
-        salary: Joi.number(),
         employeeNumber: Joi.string(),
-        manager: Joi.boolean(),
         status: Joi.string().valid('active', 'on_leave', 'terminated', 'suspended'),
         endDate: Joi.date()
     });

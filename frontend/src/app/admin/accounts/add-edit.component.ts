@@ -9,6 +9,7 @@ import { first } from "rxjs/operators";
 
 import { AccountService, AlertService } from "@app/_services";
 import { MustMatch } from "@app/_helpers";
+import { Account } from "@app/_models";
 
 @Component({ templateUrl: "add-edit.component.html" })
 export class AddEditComponent implements OnInit {
@@ -17,6 +18,8 @@ export class AddEditComponent implements OnInit {
 	isAddMode: boolean;
 	loading = false;
 	submitted = false;
+	account: Account;
+	isAdmin = false;
 
 	constructor(
 		private formBuilder: UntypedFormBuilder,
@@ -26,7 +29,6 @@ export class AddEditComponent implements OnInit {
 		private alertService: AlertService
 	) {}
 
-	// ikaduha
 	ngOnInit() {
 		this.id = this.route.snapshot.params["id"];
 		this.isAddMode = !this.id;
@@ -38,6 +40,7 @@ export class AddEditComponent implements OnInit {
 				lastName: ["", Validators.required],
 				email: ["", [Validators.required, Validators.email]],
 				role: ["", Validators.required],
+				isActive: [true],
 				password: [
 					"",
 					[
@@ -56,7 +59,11 @@ export class AddEditComponent implements OnInit {
 			this.accountService
 				.getById(this.id)
 				.pipe(first())
-				.subscribe((x) => this.form.patchValue(x));
+				.subscribe((account) => {
+					this.account = account;
+					this.isAdmin = account.role === 'Admin';
+					this.form.patchValue(account);
+				});
 		}
 	}
 
@@ -82,6 +89,31 @@ export class AddEditComponent implements OnInit {
 		} else {
 			this.updateAccount();
 		}
+	}
+
+	toggleStatus() {
+		if (!this.account || this.isAdmin) return;
+		
+		const newStatus = !this.account.isActive;
+		this.loading = true;
+		
+		this.accountService
+			.updateStatus(this.id, newStatus)
+			.pipe(first())
+			.subscribe({
+				next: () => {
+					this.account.isActive = newStatus;
+					this.form.patchValue({ isActive: newStatus });
+					this.alertService.success(`Account ${newStatus ? 'activated' : 'deactivated'} successfully`, {
+						keepAfterRouteChange: true,
+					});
+					this.loading = false;
+				},
+				error: (error) => {
+					this.alertService.error(`Failed to ${newStatus ? 'activate' : 'deactivate'} account`);
+					this.loading = false;
+				},
+			});
 	}
 
 	private createAccount() {

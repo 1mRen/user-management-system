@@ -19,10 +19,11 @@ module.exports = router;
 function createSchema(req, res, next) {
     const schema = Joi.object({
         name: Joi.string().required(),
-        description: Joi.string(),
-        code: Joi.string(),
-        location: Joi.string(),
-        accountId: Joi.number().integer()
+        description: Joi.string().allow('', null),
+        code: Joi.string().allow('', null),
+        location: Joi.string().allow('', null),
+        accountId: Joi.number().integer(),
+        isActive: Joi.boolean()
     });
     validateRequest(req, next, schema);
 }
@@ -30,10 +31,11 @@ function createSchema(req, res, next) {
 function updateSchema(req, res, next) {
     const schema = Joi.object({
         name: Joi.string(),
-        description: Joi.string(),
-        code: Joi.string(),
-        location: Joi.string(),
-        accountId: Joi.number().integer()
+        description: Joi.string().allow('', null),
+        code: Joi.string().allow('', null),
+        location: Joi.string().allow('', null),
+        accountId: Joi.number().integer(),
+        isActive: Joi.boolean()
     });
     validateRequest(req, next, schema);
 }
@@ -41,20 +43,34 @@ function updateSchema(req, res, next) {
 // Controller functions
 async function create(req, res, next) {
     try {
+        console.log('Creating department, received data:', req.body);
+        
         // If accountId is not provided, use the authenticated user's account ID
         const params = { ...req.body };
+        
+        console.log('Current user:', req.user);
+        
         if (!params.accountId && req.user) {
             params.accountId = req.user.accountId || req.user.id;
+            console.log('Using user account ID:', params.accountId);
         }
         
         if (!params.accountId) {
+            console.log('No accountId found, returning 400');
             return res.status(400).json({ message: "Account ID is required" });
         }
         
+        console.log('Creating department with params:', params);
         const department = await departmentService.create(params);
+        console.log('Department created:', department);
         return res.json(department);
     } catch (error) {
-        next(error);
+        console.error('Error creating department:', error);
+        // Return a more detailed error message
+        return res.status(500).json({ 
+            message: error.message || "Validation error",
+            details: error.toString()
+        });
     }
 }
 
@@ -78,16 +94,29 @@ async function getById(req, res, next) {
 
 async function update(req, res, next) {
     try {
+        console.log('Updating department, received data:', req.body);
+        
         // If accountId is not provided, use the authenticated user's account ID
         const params = { ...req.body };
+        
+        console.log('Current user:', req.user);
+        
         if (params.accountId === undefined && req.user) {
             params.accountId = req.user.accountId || req.user.id;
+            console.log('Using user account ID:', params.accountId);
         }
         
+        console.log('Updating department with params:', params);
         const department = await departmentService.update(req.params.id, params);
+        console.log('Department updated:', department);
         return res.json(department);
     } catch (error) {
-        next(error);
+        console.error('Error updating department:', error);
+        // Return a more detailed error message
+        return res.status(500).json({ 
+            message: error.message || "Validation error",
+            details: error.toString()
+        });
     }
 }
 

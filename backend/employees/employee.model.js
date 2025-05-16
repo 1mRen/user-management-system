@@ -13,11 +13,9 @@ function model(sequelize) {
     },
     departmentId: { type: DataTypes.INTEGER, allowNull: false },
     position: { type: DataTypes.STRING, allowNull: false },
-    salary: { type: DataTypes.DECIMAL(10, 2) },
     startDate: { type: DataTypes.DATE, allowNull: false },
     endDate: { type: DataTypes.DATE },
     employeeNumber: { type: DataTypes.STRING },
-    manager: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     status: { 
       type: DataTypes.ENUM,
       values: ['active', 'on_leave', 'terminated', 'suspended'],

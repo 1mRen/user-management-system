@@ -680,16 +680,18 @@ paths:
                   code: "IT"
                   location: "Floor 3"
                   accountId: 1
-                  createdAt: "2024-06-01T12:00:00Z"
-                  updatedAt: "2024-06-01T12:00:00Z"
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+                  isActive: true
                 - id: 2
                   name: "HR Department"
                   description: "Handles HR operations"
                   code: "HR"
                   location: "Floor 2"
                   accountId: 2
-                  createdAt: "2024-06-01T12:00:00Z"
-                  updatedAt: "2024-06-01T12:00:00Z"
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+                  isActive: true
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     post:
@@ -724,8 +726,9 @@ paths:
                 code: "IT"
                 location: "Floor 3"
                 accountId: 1
-                createdAt: "2024-06-01T12:00:00Z"
-                updatedAt: "2024-06-01T12:00:00Z"
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+                isActive: true
         "400":
           description: Invalid input
         "401":
@@ -758,8 +761,9 @@ paths:
                 code: "IT"
                 location: "Floor 3"
                 accountId: 1
-                createdAt: "2024-06-01T12:00:00Z"
-                updatedAt: "2024-06-01T12:00:00Z"
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+                isActive: true
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -796,8 +800,9 @@ paths:
                 code: "IT"
                 location: "Floor 4"
                 accountId: 1
-                createdAt: "2024-06-01T12:00:00Z"
-                updatedAt: "2024-06-02T12:00:00Z"
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-02T12:00:00Z"
+                isActive: true
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -843,6 +848,28 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Employee"
+              example:
+                - id: 1
+                  accountId: 1
+                  departmentId: 1
+                  position: "Software Engineer"
+                  salary: 60000.00
+                  startDate: "2024-06-01T12:00:00Z"
+                  endDate: null
+                  employeeNumber: "EMP001"
+                  manager: false
+                  status: "active"
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+                  isActive: true
+                  Account:
+                    id: 1
+                    firstName: "John"
+                    lastName: "Doe"
+                    email: "john.doe@example.com"
+                  Department:
+                    id: 1
+                    name: "IT Department"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     post:
@@ -857,6 +884,14 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateEmployeeRequest"
+            example:
+              accountId: 1
+              departmentId: 1
+              position: "Software Engineer"
+              salary: 60000.00
+              startDate: "2024-06-01T12:00:00Z"
+              employeeNumber: "EMP001"
+              manager: false
       responses:
         "200":
           description: Employee created successfully
@@ -864,6 +899,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Employee"
+              example:
+                id: 1
+                accountId: 1
+                departmentId: 1
+                position: "Software Engineer"
+                salary: 60000.00
+                startDate: "2024-06-01T12:00:00Z"
+                endDate: null
+                employeeNumber: "EMP001"
+                manager: false
+                status: "active"
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+                isActive: true
+                Account:
+                  id: 1
+                  firstName: "John"
+                  lastName: "Doe"
+                  email: "john.doe@example.com"
+                Department:
+                  id: 1
+                  name: "IT Department"
         "400":
           description: Invalid input
         "401":
@@ -889,6 +946,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Employee"
+              example:
+                id: 1
+                accountId: 1
+                departmentId: 1
+                position: "Software Engineer"
+                salary: 60000.00
+                startDate: "2024-06-01T12:00:00Z"
+                endDate: null
+                employeeNumber: "EMP001"
+                manager: false
+                status: "active"
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+                isActive: true
+                Account:
+                  id: 1
+                  firstName: "John"
+                  lastName: "Doe"
+                  email: "john.doe@example.com"
+                Department:
+                  id: 1
+                  name: "IT Department"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -905,6 +984,13 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/UpdateEmployeeRequest"
+            example:
+              position: "Senior Software Engineer"
+              salary: 70000.00
+              departmentId: 2
+              manager: true
+              status: "active"
+              endDate: null
       responses:
         "200":
           description: Employee updated successfully
@@ -912,6 +998,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Employee"
+              example:
+                id: 1
+                accountId: 1
+                departmentId: 2
+                position: "Senior Software Engineer"
+                salary: 70000.00
+                startDate: "2024-06-01T12:00:00Z"
+                endDate: null
+                employeeNumber: "EMP001"
+                manager: true
+                status: "active"
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-02T12:00:00Z"
+                isActive: true
+                Account:
+                  id: 1
+                  firstName: "John"
+                  lastName: "Doe"
+                  email: "john.doe@example.com"
+                Department:
+                  id: 2
+                  name: "HR Department"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -933,6 +1041,8 @@ paths:
                   message:
                     type: string
                     example: "Employee deleted successfully"
+              example:
+                message: "Employee deleted successfully"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -955,6 +1065,42 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Request"
+              example:
+                - id: 1
+                  employeeId: 1
+                  type: "leave"
+                  title: "Annual Leave"
+                  description: "Vacation leave for 2 weeks"
+                  status: "pending"
+                  priority: "medium"
+                  requestDate: "2024-06-01T12:00:00Z"
+                  completionDate: null
+                  approverId: 2
+                  details:
+                    date:
+                      - start-date: "2024-07-01"
+                        end-date: "2024-07-14"
+                        purpose: "Vacation"
+                        days: 14
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+                - id: 2
+                  employeeId: 2
+                  type: "equipment"
+                  title: "Laptop Request"
+                  description: "Requesting a new laptop"
+                  status: "approved"
+                  priority: "high"
+                  requestDate: "2024-06-01T12:00:00Z"
+                  completionDate: "2024-06-05T12:00:00Z"
+                  approverId: 1
+                  details:
+                    items:
+                      - name: "Laptop"
+                        quantity: 1
+                        purpose: "Development"
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-05T12:00:00Z"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     post:
@@ -969,6 +1115,16 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateRequestRequest"
+            example:
+              employeeId: 1
+              type: "leave"
+              title: "Annual Leave"
+              description: "Vacation leave for 2 weeks"
+              priority: "medium"
+              date:
+                - start-date: "2024-07-01"
+                  end-date: "2024-07-14"
+                  purpose: "Vacation"
       responses:
         "200":
           description: Request created successfully
@@ -976,6 +1132,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Request"
+              example:
+                id: 1
+                employeeId: 1
+                type: "leave"
+                title: "Annual Leave"
+                description: "Vacation leave for 2 weeks"
+                status: "pending"
+                priority: "medium"
+                requestDate: "2024-06-01T12:00:00Z"
+                completionDate: null
+                approverId: 2
+                details:
+                  date:
+                    - start-date: "2024-07-01"
+                      end-date: "2024-07-14"
+                      purpose: "Vacation"
+                      days: 14
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
         "400":
           description: Invalid input
         "401":
@@ -1001,6 +1176,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Request"
+              example:
+                id: 1
+                employeeId: 1
+                type: "leave"
+                title: "Annual Leave"
+                description: "Vacation leave for 2 weeks"
+                status: "pending"
+                priority: "medium"
+                requestDate: "2024-06-01T12:00:00Z"
+                completionDate: null
+                approverId: 2
+                details:
+                  date:
+                    - start-date: "2024-07-01"
+                      end-date: "2024-07-14"
+                      purpose: "Vacation"
+                      days: 14
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -1017,6 +1211,10 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/UpdateRequestRequest"
+            example:
+              status: "approved"
+              priority: "high"
+              description: "Vacation leave for 2 weeks - approved"
       responses:
         "200":
           description: Request updated successfully
@@ -1024,6 +1222,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Request"
+              example:
+                id: 1
+                employeeId: 1
+                type: "leave"
+                title: "Annual Leave"
+                description: "Vacation leave for 2 weeks - approved"
+                status: "approved"
+                priority: "high"
+                requestDate: "2024-06-01T12:00:00Z"
+                completionDate: "2024-06-10T12:00:00Z"
+                approverId: 2
+                details:
+                  date:
+                    - start-date: "2024-07-01"
+                      end-date: "2024-07-14"
+                      purpose: "Vacation"
+                      days: 14
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-10T12:00:00Z"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -1045,6 +1262,8 @@ paths:
                   message:
                     type: string
                     example: "Request deleted successfully"
+              example:
+                message: "Request deleted successfully"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -1067,6 +1286,27 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Workflow"
+              example:
+                - id: 1
+                  employeeId: 1
+                  type: "Onboarding"
+                  status: "Pending"
+                  details:
+                    task: "Setup workstation"
+                  assignedTo: 2
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+                - id: 2
+                  employeeId: 2
+                  type: "Promotion"
+                  status: "Completed"
+                  details:
+                    oldPosition: "Junior Developer"
+                    newPosition: "Senior Developer"
+                    reason: "Promotion for outstanding performance"
+                  assignedTo: 3
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     post:
@@ -1081,6 +1321,13 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateWorkflowRequest"
+            example:
+              employeeId: 1
+              type: "Onboarding"
+              status: "Pending"
+              details:
+                task: "Setup workstation"
+              assignedTo: 2
       responses:
         "200":
           description: Workflow created successfully
@@ -1088,6 +1335,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+              example:
+                id: 1
+                employeeId: 1
+                type: "Onboarding"
+                status: "Pending"
+                details:
+                  task: "Setup workstation"
+                assignedTo: 2
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
         "400":
           description: Invalid input
         "401":
@@ -1113,6 +1370,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+              example:
+                id: 1
+                employeeId: 1
+                type: "Onboarding"
+                status: "Pending"
+                details:
+                  task: "Setup workstation"
+                assignedTo: 2
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -1129,6 +1396,14 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/UpdateWorkflowRequest"
+            example:
+              type: "Promotion"
+              status: "Completed"
+              details:
+                oldPosition: "Junior Developer"
+                newPosition: "Senior Developer"
+                reason: "Promotion for outstanding performance"
+              assignedTo: 3
       responses:
         "200":
           description: Workflow updated successfully
@@ -1136,6 +1411,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+              example:
+                id: 2
+                employeeId: 2
+                type: "Promotion"
+                status: "Completed"
+                details:
+                  oldPosition: "Junior Developer"
+                  newPosition: "Senior Developer"
+                  reason: "Promotion for outstanding performance"
+                assignedTo: 3
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -1157,6 +1444,8 @@ paths:
                   message:
                     type: string
                     example: "Workflow deleted successfully"
+              example:
+                message: "Workflow deleted successfully"
         "404":
           $ref: "#/components/responses/NotFoundError"
         "401":
@@ -1211,12 +1500,14 @@ components:
         accountId:
           type: integer
           example: 1
-        createdAt:
+        created:
           type: string
           format: date-time
-        updatedAt:
+        updated:
           type: string
           format: date-time
+        isActive:
+          type: boolean
     CreateDepartmentRequest:
       type: object
       required:
