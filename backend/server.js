@@ -14,17 +14,34 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Allow CORS requests from specified origins
-const allowedOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:4200'];
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+  : ['https://user-management-system-6yrwvx8op-1mrens-projects.vercel.app', 
+     'https://user-management-system-pm.vercel.app',
+     'https://user-management-system-j0up52tis-1mrens-projects.vercel.app'];
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // For development/testing - allow requests with no origin
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    // Check if the origin is in our allowed list
+    if (allowedOrigins.some(allowedOrigin => origin.startsWith(allowedOrigin))) {
       callback(null, true);
     } else {
+      console.log(`Origin ${origin} not allowed by CORS`);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Add OPTIONS handler for preflight requests
+app.options('*', cors());
 
 // API routes
 app.use('/accounts', require('./accounts/accounts.controller'));
