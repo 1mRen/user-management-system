@@ -8,6 +8,7 @@ import { environment } from '@environments/environment';
 import { Account } from '@app/_models';
 
 const baseUrl = `${environment.apiUrl}/accounts`;
+const ACCOUNT_KEY = 'currentAccount'; // Local storage key
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {
@@ -18,8 +19,27 @@ export class AccountService {
         private router: Router,
         private http: HttpClient
     ) {
-        this.accountSubject = new BehaviorSubject<Account | null>(null);
+        // Try to load the account from localStorage on service initialization
+        let storedAccount: Account | null = null;
+        try {
+            const storedData = localStorage.getItem(ACCOUNT_KEY);
+            if (storedData) {
+                storedAccount = JSON.parse(storedData);
+                console.log('Found saved account in localStorage');
+            }
+        } catch (e) {
+            console.error('Error loading account from localStorage:', e);
+            localStorage.removeItem(ACCOUNT_KEY);
+        }
+
+        this.accountSubject = new BehaviorSubject<Account | null>(storedAccount);
         this.account = this.accountSubject.asObservable();
+        
+        // If we have a stored account, start the refresh timer
+        if (storedAccount?.jwtToken) {
+            console.log('Starting refresh token timer for stored account');
+            this.startRefreshTokenTimer();
+        }
     }
 
     public get accountValue(): Account {
@@ -29,7 +49,7 @@ export class AccountService {
     login(email: string, password: string) {
         return this.http.post<Account>(`${baseUrl}/login`, { email, password }, { withCredentials: true })
             .pipe(map(account => {
-                this.accountSubject.next(account);
+                this.storeAccount(account);
                 this.startRefreshTokenTimer();
                 return account;
             }));
@@ -40,9 +60,7 @@ export class AccountService {
             .pipe(
                 finalize(() => {
                     // These actions will run regardless of success/failure
-                    this.stopRefreshTokenTimer();
-                    this.accountSubject.next(null);
-                    this.router.navigate(['/account/login']); // Check if this path is correct
+                    this.clearAccount();
                 })
             )
             .subscribe({
@@ -56,10 +74,24 @@ export class AccountService {
     refreshToken() {
         return this.http.post<Account>(`${baseUrl}/refresh-token`, {}, { withCredentials: true })
             .pipe(map(account => {
-                this.accountSubject.next(account);
+                this.storeAccount(account);
                 this.startRefreshTokenTimer();
                 return account;
             }));
+    }
+
+    // Store account in memory and localStorage
+    private storeAccount(account: Account) {
+        this.accountSubject.next(account);
+        localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
+    }
+
+    // Clear account from memory and localStorage
+    private clearAccount() {
+        this.stopRefreshTokenTimer();
+        this.accountSubject.next(null);
+        localStorage.removeItem(ACCOUNT_KEY);
+        this.router.navigate(['/account/login']);
     }
 
     register(account: Account) {
@@ -102,7 +134,7 @@ export class AccountService {
                 if (account.id === this.accountValue.id) {
                     // publish updated account to subscribers
                     account = { ...this.accountValue, ...account };
-                    this.accountSubject.next(account);
+                    this.storeAccount(account);
                 }
                 return account;
             }));
@@ -135,11 +167,25 @@ export class AccountService {
         // parse json object from base64 encoded jwt token
         if (!this.accountValue?.jwtToken) return;
         
-        const jwtToken = JSON.parse(atob(this.accountValue.jwtToken.split('.')[1]));
-        
-        // set a timeout to refresh the token a minute before it expires
-        const expiresIn = jwtToken.exp * 1000 - Date.now() - (60 * 1000);
-        this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), expiresIn);
+        try {
+            const jwtToken = JSON.parse(atob(this.accountValue.jwtToken.split('.')[1]));
+            
+            // set a timeout to refresh the token a minute before it expires
+            const expires = new Date(jwtToken.exp * 1000);
+            const timeout = expires.getTime() - Date.now() - (60 * 1000);
+            
+            console.log(`JWT token will expire at ${expires.toLocaleString()}, refreshing in ${Math.round(timeout/1000/60)} minutes`);
+            
+            this.refreshTokenTimeout = setTimeout(() => {
+                console.log('Refreshing token...');
+                this.refreshToken().subscribe({
+                    next: () => console.log('Token refreshed successfully'),
+                    error: err => console.error('Token refresh failed:', err)
+                });
+            }, timeout);
+        } catch (e) {
+            console.error('Error parsing JWT token for refresh timer:', e);
+        }
     }
 
     private stopRefreshTokenTimer() {

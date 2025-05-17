@@ -1,5 +1,13 @@
 <div class="p-4">
 	<div class="container">
+		<div class="row">
+			<div class="col-sm-12 mb-4">
+				<nav class="nav nav-tabs">
+					<a class="nav-item nav-link" routerLink="/profile" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Profile</a>
+					<a class="nav-item nav-link" routerLink="/profile/update" routerLinkActive="active">Update Profile</a>
+				</nav>
+			</div>
+		</div>
 		<router-outlet></router-outlet>
 	</div>
 </div>
