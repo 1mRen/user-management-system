@@ -16,7 +16,7 @@ app.use(cookieParser());
 // Allow CORS requests from specified origins
 const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',')
-  : ['http://localhost:4200', 'https://user-management-system-ibgs.onrender.com'];
+  : ['http://localhost:4200', 'https://user-management-system-6yrwvx8op-1mrens-projects.vercel.app/'];
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
