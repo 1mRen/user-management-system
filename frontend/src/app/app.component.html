@@ -1,5 +1,6 @@
 <div class="app-container" [ngClass]="{ 'bg-light': account }">
-	<nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="account">
+	<!-- Admin Navigation -->
+	<nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="account && account.role === Role.Admin">
 		<div class="navbar-nav">
 			<a
 				routerLink="/"
@@ -11,12 +12,28 @@
 			<a routerLink="/profile" routerLinkActive="active" class="nav-item nav-link"
 				>Profile</a
 			>
-			<a
-				*ngIf="account?.role === Role.Admin"
-				routerLink="/admin"
-				routerLinkActive="active"
-				class="nav-item nav-link"
+			<a routerLink="/admin" routerLinkActive="active" class="nav-item nav-link"
 				>Admin</a
+			>
+			<a href="javascript:void(0)" (click)="logout()" class="nav-item nav-link">Logout</a>
+		</div>
+	</nav>
+
+	<!-- Regular User Navigation -->
+	<nav class="navbar navbar-expand navbar-dark bg-dark" *ngIf="account && account.role !== Role.Admin">
+		<div class="navbar-nav">
+			<a
+				routerLink="/"
+				routerLinkActive="active"
+				[routerLinkActiveOptions]="{ exact: true }"
+				class="nav-item nav-link"
+				>Home</a
+			>
+			<a routerLink="/profile" routerLinkActive="active" class="nav-item nav-link"
+				>Profile</a
+			>
+			<a routerLink="/requests" routerLinkActive="active" class="nav-item nav-link"
+				>Requests</a
 			>
 			<a href="javascript:void(0)" (click)="logout()" class="nav-item nav-link">Logout</a>
 		</div>

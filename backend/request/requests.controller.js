@@ -215,20 +215,20 @@ async function getById(req, res, next) {
         
         // Check if user has access to this request
         // For admins, always allow access
-        if (req.role === Role.Admin) {
+        if (req.auth.role === Role.Admin) {
             // Admin has full access, continue
             console.log('Admin access granted to request:', request.id);
         } else {
             // For non-admins, check if the request belongs to them
             console.log('Checking non-admin access:', {
-                userAccountId: req.account?.id,
+                userAccountId: req.auth?.id,
                 requestEmployeeAccountId: request.employee?.accountId
             });
             
             // Only check if both values exist
-            if (req.account && req.account.id && request.employee && request.employee.accountId) {
-                if (req.account.id !== request.employee.accountId) {
-            return res.status(403).json({ message: 'Forbidden' });
+            if (req.auth && req.auth.id && request.employee && request.employee.accountId) {
+                if (req.auth.id !== request.employee.accountId) {
+                    return res.status(403).json({ message: 'Forbidden' });
                 }
             }
         }
@@ -263,7 +263,7 @@ async function getByEmployeeId(req, res, next) {
         if (!employee) throw 'Employee not found';
         
         // Check if user has access to this employee's requests
-        if (req.role !== Role.Admin && req.account.id !== employee.accountId) {
+        if (req.auth.role !== Role.Admin && req.auth.id !== employee.accountId) {
             return res.status(403).json({ message: 'Forbidden' });
         }
         

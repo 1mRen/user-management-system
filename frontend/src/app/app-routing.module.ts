@@ -8,16 +8,18 @@ import { Role } from "./_models";
 const accountModule = () => import("./account/account.module").then((x) => x.AccountModule);
 const adminModule = () => import("./admin/admin.module").then((x) => x.AdminModule);
 const profileModule = () => import("./profile/profile.module").then((x) => x.ProfileModule);
+const requestsModule = () => import("./requests/requests.module").then((x) => x.RequestsModule);
 
 const routes: Routes = [
 	{ path: '', component: HomeComponent, canActivate: [AuthGuard] },
-	{ path: 'account', loadChildren: () => import('./account/account.module').then(m => m.AccountModule) },
-	{ path: 'profile', loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule), canActivate: [AuthGuard] },
-	{ path: 'admin', loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule), canActivate: [AuthGuard], data: { roles: [Role.Admin] } },
+	{ path: 'account', loadChildren: accountModule },
+	{ path: 'profile', loadChildren: profileModule, canActivate: [AuthGuard] },
+	{ path: 'admin', loadChildren: adminModule, canActivate: [AuthGuard], data: { roles: [Role.Admin] } },
+	{ path: 'requests', loadChildren: requestsModule, canActivate: [AuthGuard] },
   
 	// otherwise redirect to home
 	{ path: '**', redirectTo: '' }
-  ];
+];
   
 
 @NgModule({

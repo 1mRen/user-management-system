@@ -1,0 +1,131 @@
+<h1>Create New Request</h1>
+
+<div class="card">
+    <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+                <label for="type">Request Type</label>
+                <select id="type" class="form-control" formControlName="type" [ngClass]="{ 'is-invalid': submitted && f['type'].errors }">
+                    <option value="">-- Select Type --</option>
+                    <option *ngFor="let type of requestTypes" [value]="type.value">{{ type.label }}</option>
+                </select>
+                <div *ngIf="submitted && f['type'].errors" class="invalid-feedback">
+                    <div *ngIf="f['type'].errors['required']">Request type is required</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" class="form-control" formControlName="title" [ngClass]="{ 'is-invalid': submitted && f['title'].errors }" />
+                <div *ngIf="submitted && f['title'].errors" class="invalid-feedback">
+                    <div *ngIf="f['title'].errors['required']">Title is required</div>
+                </div>
+            </div>
+
+            <!-- Dynamic fields based on type -->
+            <div *ngIf="currentType === 'leave'" class="leave-section">
+                <h4>Leave Details</h4>
+                <!-- Form array for items -->
+                <div formGroupName="details">
+                    <div formArrayName="items">
+                        <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="form-row mb-2">
+                            <div class="col-md-6">
+                                <label>Leave Type</label>
+                                <select class="form-control" formControlName="name">
+                                    <option value="Vacation">Vacation</option>
+                                    <option value="Sick">Sick</option>
+                                    <option value="Personal">Personal</option>
+                                    <option value="Bereavement">Bereavement</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Number of Days</label>
+                                <input type="number" class="form-control" formControlName="quantity" min="1" />
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger btn-sm" (click)="removeItem(i)">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-info btn-sm mt-2" (click)="addItem()">Add More Leave</button>
+            </div>
+
+            <div *ngIf="currentType === 'equipment' || currentType === 'resources'" class="item-section">
+                <h4>{{ currentType === 'equipment' ? 'Equipment' : 'Resources' }} Details</h4>
+                <!-- Form array for items -->
+                <div formGroupName="details">
+                    <div formArrayName="items">
+                        <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="form-row mb-2">
+                            <div class="col-md-6">
+                                <label>Item Name</label>
+                                <input type="text" class="form-control" formControlName="name" />
+                            </div>
+                            <div class="col-md-4">
+                                <label>Quantity</label>
+                                <input type="number" class="form-control" formControlName="quantity" min="1" />
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger btn-sm" (click)="removeItem(i)">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-info btn-sm mt-2" (click)="addItem()">Add Another Item</button>
+            </div>
+
+            <div *ngIf="currentType === 'other'" class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" class="form-control" formControlName="description" rows="4"></textarea>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary" [disabled]="loading">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                    Submit Request
+                </button>
+                <a routerLink="/requests" class="btn btn-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-row {
+        display: flex;
+        margin-right: -5px;
+        margin-left: -5px;
+    }
+    .col-md-6, .col-md-4, .col-md-2 {
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+    .col-md-4 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+    .col-md-2 {
+        flex: 0 0 16.666667%;
+        max-width: 16.666667%;
+    }
+    .d-flex {
+        display: flex;
+    }
+    .align-items-end {
+        align-items: flex-end;
+    }
+    .mb-2 {
+        margin-bottom: 0.5rem;
+    }
+    .mt-2 {
+        margin-top: 0.5rem;
+    }
+    .mt-4 {
+        margin-top: 1.5rem;
+    }
+</style> 
