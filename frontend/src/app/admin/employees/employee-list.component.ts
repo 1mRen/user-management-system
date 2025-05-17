@@ -64,10 +64,7 @@ export class EmployeeListComponent implements OnInit {
         alert('View requests for employee ' + id + ' not implemented yet');
     }
 
-    viewWorkflows(id: number) {
-        // TODO: Implement workflows view for an employee
-        alert('View workflows for employee ' + id + ' not implemented yet');
-    }
+        viewWorkflows(id: number) {        this.router.navigate(['/admin/workflows/employee', id]);    }
 
     transferEmployee(employee: Employee) {
         this.selectedEmployee = employee;

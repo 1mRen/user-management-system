@@ -1,0 +1,42 @@
+<h1>Workflows</h1>
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let workflow of workflows">
+                    <td><a [routerLink]="['/admin/workflows/employee', workflow.employeeId]">{{ workflow.employeeId }}</a></td>
+                    <td>{{ workflow.type }}</td>
+                    <td>
+                        <span class="badge" [ngClass]="{
+                            'bg-warning': workflow.status.toLowerCase() === 'pending',
+                            'bg-success': workflow.status.toLowerCase() === 'completed' || workflow.status.toLowerCase() === 'approved',
+                            'bg-danger': workflow.status.toLowerCase() === 'cancelled' || workflow.status.toLowerCase() === 'rejected'
+                        }">
+                            {{ workflow.status }}
+                        </span>
+                    </td>
+                    <td>{{ workflow.created | date:'medium' }}</td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-primary" [routerLink]="['/admin/workflows/employee', workflow.employeeId]">View</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr *ngIf="!workflows.length">
+                    <td colspan="5" class="text-center">
+                        <span class="p-2">No workflows found</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div> 

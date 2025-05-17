@@ -26,6 +26,10 @@ const routes: Routes = [
             { 
                 path: "requests", 
                 loadChildren: () => import("./requests/requests.module").then(m => m.RequestsModule) 
+            },
+            { 
+                path: "workflows", 
+                loadChildren: () => import("./workflows/workflows.module").then(m => m.WorkflowsModule) 
             }
 		]
 	},
