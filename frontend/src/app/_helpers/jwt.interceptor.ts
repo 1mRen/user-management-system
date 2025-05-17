@@ -58,7 +58,7 @@ export class JwtInterceptor implements HttpInterceptor {
             tap({
                 // Log success cases for debugging
                 next: (event) => {
-                    if (event.type !== 0) { // Skip request events which have type
+                    if (event.type !== 0) { // Skip request events which have type 0
                         console.log(`JWT Interceptor - Response for ${request.url}:`, event);
                     }
                 }

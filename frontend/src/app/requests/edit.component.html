@@ -1,0 +1,154 @@
+<h1>Edit Request</h1>
+
+<div *ngIf="loading" class="text-center">
+    <div class="spinner-border spinner-border-lg"></div>
+</div>
+
+<div *ngIf="!loading && !request" class="alert alert-danger">
+    <p>Unable to load request data. The request may no longer exist or you may not have permission to edit it.</p>
+    <a routerLink="/requests" class="btn btn-primary">Back to Requests</a>
+</div>
+
+<div *ngIf="!loading && request" class="card">
+    <div class="card-header">
+        <div class="d-flex align-items-center">
+            <h2 class="mr-auto">Request #{{request.id}}</h2>
+            <span class="status-badge ml-2" [ngClass]="getStatusClass(request?.status || '')">
+                {{request?.status}}
+            </span>
+        </div>
+    </div>
+    
+    <div class="card-body">
+        <!-- Request Info Summary -->
+        <div class="request-summary mb-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Request Information</h4>
+                    <p><strong>Type:</strong> {{request.type | titlecase}}</p>
+                    <p><strong>Date Created:</strong> {{request.created | date:'medium'}}</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Edit Form -->
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label>Request Title</label>
+                    <input type="text" formControlName="title" class="form-control" [ngClass]="{ 'is-invalid': submitted && f['title'].errors }" />
+                    <div *ngIf="submitted && f['title'].errors" class="invalid-feedback">
+                        <div *ngIf="f['title'].errors['required']">Title is required</div>
+                    </div>
+                </div>
+                
+                <div class="form-group col-md-6">
+                    <label>Priority</label>
+                    <select formControlName="priority" class="form-control">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea formControlName="description" class="form-control" rows="3"></textarea>
+            </div>
+            
+            <!-- Items Section - Only for Equipment/Resources/Leave types -->
+            <div *ngIf="['equipment', 'resources', 'leave'].includes(request?.type || '')" class="mt-4" formGroupName="details">
+                <h4>
+                    {{ request?.type === 'leave' ? 'Leave' : request?.type === 'equipment' ? 'Equipment' : 'Resources' }} Items
+                </h4>
+                
+                <div formArrayName="items" class="items-container">
+                    <div *ngFor="let item of items.controls; let i = index" class="card mb-3">
+                        <div class="card-body" [formGroupName]="i">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="mb-0">Item #{{i+1}}</h5>
+                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        *ngIf="items.length > 1" 
+                                        (click)="removeItem(i)">
+                                    Remove
+                                </button>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group col-md-8">
+                                    <label>{{ request?.type === 'leave' ? 'Leave Type' : 'Item Name' }}</label>
+                                    <input type="text" formControlName="name" class="form-control" 
+                                           [ngClass]="{ 'is-invalid': submitted && items.controls[i].get('name')?.errors }"
+                                           placeholder="{{ request?.type === 'leave' ? 'e.g., Vacation, Sick, Personal' : 'Enter item name' }}" />
+                                    <div *ngIf="submitted && items.controls[i].get('name')?.errors" class="invalid-feedback">
+                                        <div *ngIf="items.controls[i].get('name')?.errors?.['required']">
+                                            {{ request?.type === 'leave' ? 'Leave type' : 'Item name' }} is required
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group col-md-4">
+                                    <label>{{ request?.type === 'leave' ? 'Days' : 'Quantity' }}</label>
+                                    <input type="number" formControlName="quantity" class="form-control" min="1"
+                                           [ngClass]="{ 'is-invalid': submitted && items.controls[i].get('quantity')?.errors }" />
+                                    <div *ngIf="submitted && items.controls[i].get('quantity')?.errors" class="invalid-feedback">
+                                        <div *ngIf="items.controls[i].get('quantity')?.errors?.['required']">
+                                            {{ request?.type === 'leave' ? 'Number of days' : 'Quantity' }} is required
+                                        </div>
+                                        <div *ngIf="items.controls[i].get('quantity')?.errors?.['min']">
+                                            Minimum value is 1
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn btn-outline-primary" (click)="addItem()">
+                        Add {{ request?.type === 'leave' ? 'Leave Period' : 'Item' }}
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary" [disabled]="loading">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                    Save Changes
+                </button>
+                <a routerLink="/requests" class="btn btn-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .status-badge {
+        display: inline-block;
+        padding: 0.4rem 0.6rem;
+        border-radius: 0.25rem;
+        color: white;
+        text-align: center;
+        min-width: 5rem;
+    }
+    .status-success {
+        background-color: #28a745;
+    }
+    .status-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .status-danger {
+        background-color: #dc3545;
+    }
+    .status-info {
+        background-color: #17a2b8;
+    }
+    .items-container {
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+    }
+</style> 

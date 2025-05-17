@@ -27,6 +27,7 @@
                 <th>Date</th>
                 <th>Status</th>
                 <th>Details</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -55,9 +56,15 @@
                         {{ request.description || 'No description provided' }}
                     </div>
                 </td>
+                <td>
+                    <!-- Show edit button only for pending requests -->
+                    <a *ngIf="request.status.toLowerCase() === 'pending'" [routerLink]="['/requests/edit', request.id]" class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                </td>
             </tr>
             <tr *ngIf="requests.length === 0">
-                <td colspan="5" class="text-center">
+                <td colspan="6" class="text-center">
                     <span>No requests found</span>
                 </td>
             </tr>
@@ -114,6 +121,11 @@
     }
     .btn-success {
         background-color: #28a745;
+        color: white;
+        border: none;
+    }
+    .btn-primary {
+        background-color: #007bff;
         color: white;
         border: none;
     }

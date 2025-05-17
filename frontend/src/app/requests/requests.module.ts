@@ -6,6 +6,7 @@ import { RequestsRoutingModule } from './requests-routing.module';
 import { ListComponent } from './list.component';
 import { LayoutComponent } from './layout.component';
 import { AddComponent } from './add.component';
+import { EditComponent } from './edit.component';
 import { RequestService } from '@app/admin/requests/request.service';
 
 @NgModule({
@@ -18,7 +19,8 @@ import { RequestService } from '@app/admin/requests/request.service';
     declarations: [
         ListComponent,
         LayoutComponent,
-        AddComponent
+        AddComponent,
+        EditComponent
     ],
     providers: [
         RequestService

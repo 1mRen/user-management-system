@@ -144,8 +144,8 @@ export class ListComponent implements OnInit {
             return;
         }
         
-        // Use direct API URL with employee ID filter
-        const url = `${environment.apiUrl}/requests?employeeId=${this.employeeId}`;
+        // Use the employee-specific endpoint instead of query parameters
+        const url = `${environment.apiUrl}/requests/employee/${this.employeeId}`;
         
         // Get the current token
         const account = this.accountService.accountValue;
