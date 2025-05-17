@@ -1,0 +1,263 @@
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Request ID</th>
+                <th>Employee</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let request of requests">
+                <td>{{ request.id }}</td>
+                <td>{{ request.employee?.account?.firstName }} {{ request.employee?.account?.lastName }}</td>
+                <td>{{ request.type }}</td>
+                <td>{{ request.created | date:'M/d/yyyy' }}</td>
+                <td>
+                    <span class="status-badge" [ngClass]="getStatusClass(request.status)">
+                        {{ request.status }}
+                    </span>
+                </td>
+                <td class="action-buttons">
+                    <button class="btn btn-info" (click)="viewDetails(request.id)">View</button>
+                    <button *ngIf="request.status.toLowerCase() === 'pending'" class="btn btn-success" (click)="openApproveModal(request)">Approve</button>
+                    <button *ngIf="request.status.toLowerCase() === 'pending'" class="btn btn-danger" (click)="openRejectModal(request)">Reject</button>
+                </td>
+            </tr>
+            <tr *ngIf="!requests || requests.length === 0">
+                <td colspan="6" class="text-center">
+                    <span *ngIf="loading" class="spinner-border spinner-border-lg align-center"></span>
+                    <span *ngIf="!loading">No requests found</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-2">
+    <a routerLink="add" class="btn btn-success">Create Request</a>
+</div>
+
+<!-- Approve Modal -->
+<div *ngIf="showApproveModal" class="modal-backdrop" (click)="cancelModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Approve Request</h5>
+                <button type="button" class="close" (click)="cancelModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="selectedRequest" class="form-group">
+                    <p>Are you sure you want to approve this request?</p>
+                    <p><strong>Type:</strong> {{ selectedRequest.type }}</p>
+                    <p><strong>Employee:</strong> {{ selectedRequest.employee?.account?.firstName }} {{ selectedRequest.employee?.account?.lastName }}</p>
+                    
+                    <!-- Equipment/Resource Items -->
+                    <div *ngIf="selectedRequest.type?.toLowerCase() === 'equipment' || selectedRequest.type?.toLowerCase() === 'resources'">
+                        <p><strong>Items:</strong></p>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of selectedRequest.details?.items">
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="form-group mt-3">
+                        <label>Comments (Optional):</label>
+                        <textarea [(ngModel)]="approvalComments" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cancelModal()">Cancel</button>
+                <button type="button" class="btn btn-success" 
+                        [disabled]="submitting" 
+                        (click)="approveRequest()">
+                    <span *ngIf="submitting" class="spinner-border spinner-border-sm mr-1"></span>
+                    Approve
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div *ngIf="showRejectModal" class="modal-backdrop" (click)="cancelModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Request</h5>
+                <button type="button" class="close" (click)="cancelModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="selectedRequest" class="form-group">
+                    <p>Are you sure you want to reject this request?</p>
+                    <p><strong>Type:</strong> {{ selectedRequest.type }}</p>
+                    <p><strong>Employee:</strong> {{ selectedRequest.employee?.account?.firstName }} {{ selectedRequest.employee?.account?.lastName }}</p>
+                    
+                    <!-- Equipment/Resource Items -->
+                    <div *ngIf="selectedRequest.type?.toLowerCase() === 'equipment' || selectedRequest.type?.toLowerCase() === 'resources'">
+                        <p><strong>Items:</strong></p>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of selectedRequest.details?.items">
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="form-group mt-3">
+                        <label>Reason for Rejection:</label>
+                        <textarea [(ngModel)]="rejectionReason" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cancelModal()">Cancel</button>
+                <button type="button" class="btn btn-danger" 
+                        [disabled]="submitting || !rejectionReason" 
+                        (click)="rejectRequest()">
+                    <span *ngIf="submitting" class="spinner-border spinner-border-sm mr-1"></span>
+                    Reject
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table {
+        margin-bottom: 0;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    .table td, .table th {
+        padding: 0.75rem;
+        vertical-align: middle;
+        border: 1px solid #dee2e6;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 0.4rem 0.6rem;
+        border-radius: 0.25rem;
+        color: white;
+        text-align: center;
+        min-width: 5rem;
+    }
+    .status-success {
+        background-color: #28a745;
+    }
+    .status-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .status-danger {
+        background-color: #dc3545;
+    }
+    .status-info {
+        background-color: #17a2b8;
+    }
+    .action-buttons {
+        white-space: nowrap;
+    }
+    .action-buttons .btn {
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+    .btn-info {
+        background-color: #17a2b8;
+        color: white;
+        border: none;
+    }
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+        border: none;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+    }
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1050;
+    }
+    .modal-dialog {
+        max-width: 500px;
+        margin: 1.75rem auto;
+    }
+    .modal-content {
+        background-color: white;
+        border-radius: 0.3rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+    }
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .modal-body {
+        padding: 1rem;
+    }
+    .modal-footer {
+        padding: 1rem;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: flex-end;
+    }
+    .close {
+        border: none;
+        background: transparent;
+        font-size: 1.5rem;
+        font-weight: 700;
+        opacity: 0.5;
+        cursor: pointer;
+    }
+    .close:hover {
+        opacity: 1;
+    }
+    .mt-2 {
+        margin-top: 0.5rem;
+    }
+    .mt-3 {
+        margin-top: 1rem;
+    }
+</style> 

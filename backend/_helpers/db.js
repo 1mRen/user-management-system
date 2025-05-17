@@ -108,16 +108,34 @@ async function initialize() {
         db.Employee.belongsTo(db.Department, { foreignKey: 'departmentId' });
         
         // Employee - Request (One-to-Many)
-        db.Employee.hasMany(db.Request, { foreignKey: 'employeeId' });
-        db.Request.belongsTo(db.Employee, { foreignKey: 'employeeId' });
+        db.Employee.hasMany(db.Request, { 
+            foreignKey: 'employeeId',
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE'
+        });
+        db.Request.belongsTo(db.Employee, { 
+            foreignKey: 'employeeId',
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE'
+        });
         
         // Employee - Workflow (One-to-Many)
         db.Employee.hasMany(db.Workflow, { foreignKey: 'employeeId' });
         db.Workflow.belongsTo(db.Employee, { foreignKey: 'employeeId' });
         
         // Approver - Request (One-to-Many)
-        db.Employee.hasMany(db.Request, { foreignKey: 'approverId', as: 'ApprovedRequests' });
-        db.Request.belongsTo(db.Employee, { foreignKey: 'approverId', as: 'Approver' });
+        db.Employee.hasMany(db.Request, { 
+            foreignKey: 'approverId', 
+            as: 'ApprovedRequests',
+            onDelete: 'SET NULL',
+            onUpdate: 'CASCADE' 
+        });
+        db.Request.belongsTo(db.Employee, { 
+            foreignKey: 'approverId', 
+            as: 'Approver',
+            onDelete: 'SET NULL',
+            onUpdate: 'CASCADE' 
+        });
         
         // Assigned Employee - Workflow (One-to-Many)
         db.Employee.hasMany(db.Workflow, { foreignKey: 'assignedTo', as: 'AssignedWorkflows' });

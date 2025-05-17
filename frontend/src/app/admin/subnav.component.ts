@@ -8,6 +8,7 @@ import { Component } from "@angular/core";
             <a routerLink="/admin/accounts" routerLinkActive="active">Accounts</a>
             <a routerLink="/admin/employees" routerLinkActive="active">Employees</a>
             <a routerLink="/admin/departments" routerLinkActive="active">Departments</a>
+            <a routerLink="/admin/requests" routerLinkActive="active">Requests</a>
         </nav>
     `,
     styles: [`

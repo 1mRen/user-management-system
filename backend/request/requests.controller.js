@@ -37,8 +37,7 @@ function createSchema(req, res, next) {
             items: Joi.array().items(
                 Joi.object({
                     name: Joi.string().required(),
-                    quantity: Joi.number().integer().min(1).required(),
-                    purpose: Joi.string().required()
+                    quantity: Joi.number().integer().min(1).required()
                 })
             ).required()
         });
@@ -58,8 +57,7 @@ function createSchema(req, res, next) {
             date: Joi.array().items(
                 Joi.object({
                     "start-date": Joi.date().iso().required(),
-                    "end-date": Joi.date().iso().min(Joi.ref('start-date')).required(),
-                    purpose: Joi.string().required()
+                    "end-date": Joi.date().iso().min(Joi.ref('start-date')).required()
                 })
             ).required()
         });
@@ -83,15 +81,13 @@ function updateSchema(req, res, next) {
         items: Joi.array().items(
             Joi.object({
                 name: Joi.string(),
-                quantity: Joi.number().integer().min(1),
-                purpose: Joi.string()
+                quantity: Joi.number().integer().min(1)
             })
         ),
         date: Joi.array().items(
             Joi.object({
                 "start-date": Joi.date().iso(),
-                "end-date": Joi.date().iso(),
-                purpose: Joi.string()
+                "end-date": Joi.date().iso()
             })
         )
     });
@@ -143,7 +139,6 @@ async function create(req, res, next) {
                 return {
                     startDate: period["start-date"],
                     endDate: period["end-date"],
-                    purpose: period.purpose,
                     days: diffDays
                 };
             });
@@ -173,16 +168,104 @@ async function getAll(req, res, next) {
 
 async function getById(req, res, next) {
     try {
-        const request = await requestService.getById(req.params.id);
+        console.log('Getting request by ID:', req.params.id);
+        
+        // Ensure ID is a valid number
+        const id = parseInt(req.params.id);
+        if (isNaN(id)) {
+            return res.status(400).json({ message: 'Invalid request ID' });
+        }
+        
+        console.log(`Calling requestService.getById with ID: ${id}`);
+        const request = await requestService.getById(id);
+        
+        // For debugging - log the request object
+        console.log('Request found:', { 
+            id: request.id, 
+            type: request.type, 
+            status: request.status,
+            employeeId: request.employeeId
+        });
+        
+        // Enhanced employee relation handling
+        try {
+            // Check if employee relation is present
+            if (!request.employee && request.employeeId) {
+                console.error('Employee relation missing in request:', {
+                    id: request.id,
+                    employeeId: request.employeeId
+                });
+                
+                // Try to load the employee directly
+                const employee = await db.Employee.findByPk(request.employeeId, {
+                    include: [{ model: db.Account }]
+                });
+                
+                if (employee) {
+                    console.log('Employee loaded separately:', {
+                        id: employee.id,
+                        accountId: employee.accountId
+                    });
+                    request.employee = employee;
+                } else {
+                    console.log('Could not find employee with ID:', request.employeeId);
+                    // Create a placeholder employee to avoid null reference errors
+                    request.employee = { 
+                        id: request.employeeId,
+                        accountId: null, 
+                        account: null 
+                    };
+                }
+            }
+            
+            // Ensure we have employee object even if fetching failed
+            if (!request.employee) {
+                request.employee = { id: null, accountId: null, account: null };
+            }
+        } catch (employeeError) {
+            console.error('Error loading employee relation:', employeeError);
+            // Don't let this block the request from being returned
+            request.employee = { id: null, accountId: null, account: null };
+        }
         
         // Check if user has access to this request
-        if (req.role !== Role.Admin && req.account.id !== request.employee.accountId) {
+        // For admins, always allow access
+        if (req.role === Role.Admin) {
+            // Admin has full access, continue
+            console.log('Admin access granted to request:', request.id);
+        } else {
+            // For non-admins, check if the request belongs to them
+            console.log('Checking non-admin access:', {
+                userAccountId: req.account?.id,
+                requestEmployeeAccountId: request.employee?.accountId
+            });
+            
+            // Only check if both values exist
+            if (req.account && req.account.id && request.employee && request.employee.accountId) {
+                if (req.account.id !== request.employee.accountId) {
             return res.status(403).json({ message: 'Forbidden' });
+                }
+            }
         }
         
         return res.json(request);
     } catch (error) {
-        next(error);
+        console.error('Error in getById controller:', error);
+        
+        // Send a more descriptive error back to the client
+        if (error === 'Request not found') {
+            return res.status(404).json({ message: 'Request not found' });
+        }
+        
+        if (error === 'Invalid request ID format') {
+            return res.status(400).json({ message: 'Invalid request ID format' });
+        }
+        
+        if (error === 'Error loading request details') {
+            return res.status(500).json({ message: 'Error loading request details' });
+        }
+        
+        return res.status(500).json({ message: 'Internal server error', error: error.toString() });
     }
 }
 

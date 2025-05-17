@@ -2,6 +2,11 @@ const { DataTypes } = require('sequelize');
 
 function model(sequelize) {
   const attributes = {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
     employeeId: { type: DataTypes.INTEGER, allowNull: false },
     type: { 
       type: DataTypes.STRING,allowNull: false 

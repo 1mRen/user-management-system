@@ -91,24 +91,24 @@
 						<div>
 							<span class="mr-3">Status:</span>
 							<span 
-								[class]="account?.isActive ? 'badge bg-success' : 'badge bg-danger'"
+								[class]="account.isActive ? 'badge bg-success' : 'badge bg-danger'"
 								style="font-size: 14px; padding: 5px 10px;">
-								{{ account?.isActive ? 'Active' : 'Inactive' }}
+								{{ account.isActive ? 'Active' : 'Inactive' }}
 							</span>
 						</div>
 						<button 
 							type="button" 
 							class="btn btn-sm" 
-							[class.btn-danger]="account?.isActive"
-							[class.btn-success]="!account?.isActive"
+							[class.btn-danger]="account.isActive"
+							[class.btn-success]="!account.isActive"
 							(click)="toggleStatus()"
 							[disabled]="loading">
-							{{ account?.isActive ? 'Deactivate Account' : 'Activate Account' }}
+							{{ account.isActive ? 'Deactivate Account' : 'Activate Account' }}
 							<span *ngIf="loading" class="spinner-border spinner-border-sm ml-1"></span>
 						</button>
 					</div>
 					<small class="text-muted mt-2 d-block">
-						{{ account?.isActive ? 
+						{{ account.isActive ? 
 							'Deactivating this account will prevent the user from logging in.' : 
 							'Activating this account will allow the user to log in again.' }}
 					</small>
