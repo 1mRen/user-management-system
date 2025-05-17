@@ -72,6 +72,22 @@
     </table>
 </div>
 
+<!-- Debug section - for testing only -->
+<div class="alert alert-info mt-3" *ngIf="requests.length > 0">
+    <p><strong>Debug Links:</strong></p>
+    <p>Test router navigation: 
+        <a [routerLink]="['/requests/edit', requests[0].id]" class="btn btn-sm btn-warning">
+            Debug Edit First Request
+        </a>
+    </p>
+    <p>Test direct navigation:
+        <button type="button" class="btn btn-sm btn-danger" (click)="debugNavigateToEdit(requests[0].id)">
+            Force Navigate to Edit
+        </button>
+    </p>
+    <p>First request ID: {{ requests.length > 0 ? requests[0].id : 'No requests' }}</p>
+</div>
+
 <div class="mt-3">
     <a routerLink="/requests/add" class="btn btn-success">Create New Request</a>
 </div>

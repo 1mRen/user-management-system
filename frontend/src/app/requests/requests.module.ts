@@ -9,6 +9,9 @@ import { AddComponent } from './add.component';
 import { EditComponent } from './edit.component';
 import { RequestService } from '@app/admin/requests/request.service';
 
+// Add console log to check if module is loaded
+console.log('=========== REQUESTS MODULE LOADED ===========');
+
 @NgModule({
     imports: [
         CommonModule,
