@@ -4,8 +4,8 @@
 
 export const environment = {
 	production: false,
-	apiUrl: "http://localhost:4000",
-	//apiUrl: "https://user-management-system-ibgs.onrender.com",
+	//apiUrl: "http://localhost:4000",
+	apiUrl: "https://user-management-system-ibgs.onrender.com"
 };
 
 /*
