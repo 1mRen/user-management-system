@@ -54,10 +54,10 @@ function createSchema(req, res, next) {
     } else if (req.body.type === 'leave') {
         schema = Joi.object({
             ...baseSchema,
-            date: Joi.array().items(
+            items: Joi.array().items(
                 Joi.object({
-                    "start-date": Joi.date().iso().required(),
-                    "end-date": Joi.date().iso().min(Joi.ref('start-date')).required()
+                    name: Joi.string().required(),
+                    quantity: Joi.number().integer().min(1).required()
                 })
             ).required()
         });
@@ -123,28 +123,13 @@ async function create(req, res, next) {
             }
             formattedBody.details.items = req.body.items;
         } else if (req.body.type === 'leave') {
-            if (!req.body.date || !Array.isArray(req.body.date)) {
+            if (!req.body.items || !Array.isArray(req.body.items)) {
                 return res.status(400).json({ 
-                    message: 'Leave requests must include a date array' 
+                    message: 'Leave requests must include an items array' 
                 });
             }
             
-            // Calculate days for each leave period
-            const datesWithDays = req.body.date.map(period => {
-                const startDate = new Date(period["start-date"]);
-                const endDate = new Date(period["end-date"]);
-                const diffTime = Math.abs(endDate - startDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
-                
-                return {
-                    startDate: period["start-date"],
-                    endDate: period["end-date"],
-                    days: diffDays
-                };
-            });
-            
-            formattedBody.details.date = req.body.date;
-            formattedBody.details.calculatedDays = datesWithDays;
+            formattedBody.details.items = req.body.items;
         } else {
             // For other request types
             formattedBody.details = req.body.details || {};

@@ -224,26 +224,18 @@ async function update(id, params) {
     }
     
     // If updating dates for leave requests
-        if (request.type && request.type.toLowerCase && 
-            request.type.toLowerCase() === 'leave' && params.date && Array.isArray(params.date)) {
-        // Calculate days for each leave period
-        const datesWithDays = params.date.map(period => {
-            const startDate = new Date(period["start-date"]);
-            const endDate = new Date(period["end-date"]);
-            const diffTime = Math.abs(endDate - startDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
-            
-            return {
-                startDate: period["start-date"],
-                endDate: period["end-date"],
-                days: diffDays
-            };
-        });
-        
+    if (request.type && request.type.toLowerCase && 
+        request.type.toLowerCase() === 'leave' && params.items && Array.isArray(params.items)) {
         // Update the details in the request
         request.details = request.details || {};
-        request.details.date = params.date;
-        request.details.calculatedDays = datesWithDays;
+        request.details.items = params.items.map(item => {
+            if (item && typeof item === 'object') {
+                const newItem = { ...item };
+                delete newItem.purpose;
+                return newItem;
+            }
+            return item;
+        });
     }
     
     // Handle other updates to the request entity

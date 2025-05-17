@@ -52,6 +52,12 @@ export class RequestFormComponent implements OnInit {
         // Watch for type changes to adjust form
         this.form.get('type')?.valueChanges.subscribe(type => {
             this.updateFormForType(type);
+            
+            // Allow a moment for the DOM to update after type changes
+            setTimeout(() => {
+                // Apply custom styling to the dropdown if needed
+                this.adjustDropdownVisibility();
+            }, 100);
         });
 
         // In edit mode, load the request details
@@ -150,6 +156,11 @@ export class RequestFormComponent implements OnInit {
             // Load employees for dropdown
             this.loadEmployees();
         }
+        
+        // Initialize dropdown styling
+        setTimeout(() => {
+            this.adjustDropdownVisibility();
+        }, 200);
     }
 
     // Convenience getter for form fields
@@ -182,7 +193,7 @@ export class RequestFormComponent implements OnInit {
     
     // Update form fields based on request type
     updateFormForType(type: string) {
-        if (type.toLowerCase() === 'equipment' || type.toLowerCase() === 'resources') {
+        if (type.toLowerCase() === 'equipment' || type.toLowerCase() === 'resources' || type.toLowerCase() === 'leave') {
             if (this.itemsArray.length === 0) {
                 this.addItem();
             }
@@ -335,5 +346,34 @@ export class RequestFormComponent implements OnInit {
                     this.submitting = false;
                 }
             });
+    }
+
+    // Ensure dropdown is fully visible
+    adjustDropdownVisibility() {
+        try {
+            // Use a type assertion for the querySelectorAll result
+            const selectElements = document.querySelectorAll('select.form-control');
+            
+            // Iterate through NodeList with proper typecasting for each element
+            for (let i = 0; i < selectElements.length; i++) {
+                const select = selectElements[i] as HTMLSelectElement;
+                
+                // Now we can safely access style properties
+                select.classList.add('custom-select');
+                
+                if (select.parentElement) {
+                    select.parentElement.style.position = 'relative';
+                    select.parentElement.style.width = '100%';
+                    select.parentElement.style.display = 'block';
+                    
+                    // Apply styles directly to the select element
+                    select.style.textOverflow = 'ellipsis';
+                    select.style.overflow = 'hidden';
+                    select.style.paddingRight = '35px';
+                }
+            }
+        } catch (error) {
+            console.error('Error adjusting dropdown visibility:', error);
+        }
     }
 } 

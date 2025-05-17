@@ -35,135 +35,145 @@
 
             <!-- Form Section -->
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="request-form">
-                <div class="form-grid">
-                    <!-- Left Column -->
-                    <div class="form-column">
-                        <!-- Type -->
-                        <div class="form-group">
-                            <label>Request Type</label>
-                            <select 
-                                formControlName="type" 
-                                class="form-control"
-                                [ngClass]="{'is-invalid': submitted && f['type'].errors}"
-                                [disabled]="isEditMode"
-                            >
-                                <option value="equipment">Equipment</option>
-                                <option value="leave">Leave</option>
-                                <option value="transfer">Transfer</option>
-                                <option value="promotion">Promotion</option>
-                                <option value="resources">Resources</option>
-                                <option value="other">Other</option>
-                            </select>
-                            <div *ngIf="submitted && f['type'].errors" class="invalid-feedback">
-                                <div *ngIf="f['type'].errors['required']">Type is required</div>
+                <!-- Basic Information Section -->
+                <div class="section-container">
+                    <h4 class="section-title">Basic Information</h4>
+                    <div class="form-grid">
+                        <!-- Left Column -->
+                        <div class="form-column">
+                                                        <!-- Type -->
+                            <div class="form-group">
+                                <label>Request Type</label>
+                                <div class="custom-select-wrapper">
+                                    <select 
+                                        formControlName="type" 
+                                        class="form-control custom-select"
+                                        [ngClass]="{'is-invalid': submitted && f['type'].errors}"
+                                        [disabled]="isEditMode"
+                                    >
+                                        <option value="equipment">Equipment Request</option>
+                                        <option value="leave">Leave Request</option>
+                                        <option value="transfer">Transfer Request</option>
+                                        <option value="promotion">Promotion Request</option>
+                                        <option value="resources">Resources Request</option>
+                                        <option value="other">Other Request</option>
+                                    </select>
+                                </div>
+                                <div *ngIf="submitted && f['type'].errors" class="invalid-feedback">
+                                    <div *ngIf="f['type'].errors['required']">Type is required</div>
+                                </div>
+                            </div>
+
+                            <!-- Title -->
+                            <div class="form-group">
+                                <label>Request Title</label>
+                                <input 
+                                    type="text" 
+                                    formControlName="title" 
+                                    class="form-control" 
+                                    [ngClass]="{'is-invalid': submitted && f['title'].errors}"
+                                    placeholder="Enter a descriptive title"
+                                />
+                                <div *ngIf="submitted && f['title'].errors" class="invalid-feedback">
+                                    <div *ngIf="f['title'].errors['required']">Title is required</div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Title -->
-                        <div class="form-group">
-                            <label>Request Title</label>
-                            <input 
-                                type="text" 
-                                formControlName="title" 
-                                class="form-control" 
-                                [ngClass]="{'is-invalid': submitted && f['title'].errors}"
-                                placeholder="Enter a descriptive title"
-                            />
-                            <div *ngIf="submitted && f['title'].errors" class="invalid-feedback">
-                                <div *ngIf="f['title'].errors['required']">Title is required</div>
+                        <!-- Right Column -->
+                        <div class="form-column">
+                            <!-- Employee (only in create mode) -->
+                            <div *ngIf="!isEditMode" class="form-group">
+                                <label>Select Employee</label>
+                                <select 
+                                    formControlName="employeeId" 
+                                    class="form-control"
+                                    [ngClass]="{'is-invalid': submitted && f['employeeId'].errors}"
+                                >
+                                    <option value="">-- Select an employee --</option>
+                                    <option *ngFor="let employee of employees" [value]="employee.id">
+                                        {{ employee.employeeNumber }} - {{ employee.account?.firstName }} {{ employee.account?.lastName }}
+                                    </option>
+                                </select>
+                                <div *ngIf="submitted && f['employeeId'].errors" class="invalid-feedback">
+                                    <div *ngIf="f['employeeId'].errors['required']">Employee is required</div>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Description -->
-                        <div class="form-group">
-                            <label>Description</label>
-                            <textarea 
-                                formControlName="description" 
-                                class="form-control"
-                                rows="4"
-                                placeholder="Provide details about this request"
-                            ></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Right Column -->
-                    <div class="form-column">
-                        <!-- Employee (only in create mode) -->
-                        <div *ngIf="!isEditMode" class="form-group">
-                            <label>Select Employee</label>
-                            <select 
-                                formControlName="employeeId" 
-                                class="form-control"
-                                [ngClass]="{'is-invalid': submitted && f['employeeId'].errors}"
-                            >
-                                <option value="">-- Select an employee --</option>
-                                <option *ngFor="let employee of employees" [value]="employee.id">
-                                    {{ employee.employeeNumber }} - {{ employee.account?.firstName }} {{ employee.account?.lastName }}
-                                </option>
-                            </select>
-                            <div *ngIf="submitted && f['employeeId'].errors" class="invalid-feedback">
-                                <div *ngIf="f['employeeId'].errors['required']">Employee is required</div>
+                            <!-- Description -->
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea 
+                                    formControlName="description" 
+                                    class="form-control"
+                                    rows="4"
+                                    placeholder="Provide details about this request"
+                                ></textarea>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Items Section - Only for Equipment/Resources -->
-                <div *ngIf="form.get('type')?.value === 'equipment' || form.get('type')?.value === 'resources'" class="items-section mt-4">
+                <div *ngIf="form.get('type')?.value === 'equipment' || form.get('type')?.value === 'resources' || form.get('type')?.value === 'leave'" class="section-container mt-4">
                     <h4 class="section-title">
                         <i class="fas fa-box"></i> 
-                        {{ form.get('type')?.value === 'equipment' ? 'Equipment' : 'Resources' }} Items
+                        {{ form.get('type')?.value === 'leave' ? 'Leave' : form.get('type')?.value === 'equipment' ? 'Equipment' : 'Resources' }} Items
                     </h4>
-                    <div class="items-container" formArrayName="items">
-                        <div *ngFor="let item of itemsArray.controls; let i = index" class="item-card">
-                            <div [formGroupName]="i" class="item-form">
-                                <div class="item-header">
-                                    <h5>Item #{{ i + 1 }}</h5>
-                                    <button 
-                                        type="button" 
-                                        class="btn btn-outline-danger btn-sm" 
-                                        (click)="removeItem(i)"
-                                        *ngIf="itemsArray.length > 1"
-                                    >
-                                        <i class="fas fa-times"></i> Remove
-                                    </button>
-                                </div>
-                                <div class="item-fields">
-                                    <div class="form-group">
-                                        <label>Item Name</label>
-                                        <input 
-                                            type="text" 
-                                            formControlName="name" 
-                                            class="form-control" 
-                                            [ngClass]="{'is-invalid': submitted && item.get('name')?.errors}"
-                                            placeholder="Enter item name"
-                                        />
-                                        <div *ngIf="submitted && item.get('name')?.errors" class="invalid-feedback">
-                                            <div *ngIf="item.get('name')?.errors?.['required']">Name is required</div>
-                                        </div>
+                    <div class="equipment-container">
+                        <div class="items-list" formArrayName="items">
+                            <div *ngFor="let item of itemsArray.controls; let i = index" class="item-card">
+                                <div [formGroupName]="i" class="item-form">
+                                    <div class="item-header">
+                                        <h5>Item #{{ i + 1 }}</h5>
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-outline-danger btn-sm" 
+                                            (click)="removeItem(i)"
+                                            *ngIf="itemsArray.length > 1"
+                                        >
+                                            <i class="fas fa-times"></i> Remove
+                                        </button>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Quantity</label>
-                                        <input 
-                                            type="number" 
-                                            formControlName="quantity" 
-                                            class="form-control" 
-                                            min="1"
-                                            [ngClass]="{'is-invalid': submitted && item.get('quantity')?.errors}"
-                                            placeholder="Enter quantity"
-                                        />
-                                        <div *ngIf="submitted && item.get('quantity')?.errors" class="invalid-feedback">
-                                            <div *ngIf="item.get('quantity')?.errors?.['required']">Quantity is required</div>
-                                            <div *ngIf="item.get('quantity')?.errors?.['min']">Minimum quantity is 1</div>
+                                    <div class="item-fields">
+                                        <div class="form-group">
+                                            <label>{{ form.get('type')?.value === 'leave' ? 'Leave Type' : 'Item Name' }}</label>
+                                            <input 
+                                                type="text" 
+                                                formControlName="name" 
+                                                class="form-control" 
+                                                [ngClass]="{'is-invalid': submitted && item.get('name')?.errors}"
+                                                placeholder="{{ form.get('type')?.value === 'leave' ? 'Enter leave type (e.g. Vacation, Sick, Personal)' : 'Enter item name' }}"
+                                            />
+                                            <div *ngIf="submitted && item.get('name')?.errors" class="invalid-feedback">
+                                                <div *ngIf="item.get('name')?.errors?.['required']">{{ form.get('type')?.value === 'leave' ? 'Leave type' : 'Name' }} is required</div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>{{ form.get('type')?.value === 'leave' ? 'Days' : 'Quantity' }}</label>
+                                            <input 
+                                                type="number" 
+                                                formControlName="quantity" 
+                                                class="form-control" 
+                                                min="1"
+                                                [ngClass]="{'is-invalid': submitted && item.get('quantity')?.errors}"
+                                                placeholder="{{ form.get('type')?.value === 'leave' ? 'Enter number of days' : 'Enter quantity' }}"
+                                            />
+                                            <div *ngIf="submitted && item.get('quantity')?.errors" class="invalid-feedback">
+                                                <div *ngIf="item.get('quantity')?.errors?.['required']">{{ form.get('type')?.value === 'leave' ? 'Number of days' : 'Quantity' }} is required</div>
+                                                <div *ngIf="item.get('quantity')?.errors?.['min']">Minimum {{ form.get('type')?.value === 'leave' ? 'days' : 'quantity' }} is 1</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="add-item-button">
+                            <button type="button" class="btn btn-outline-primary" (click)="addItem()">
+                                <i class="fas fa-plus"></i> Add Another {{ form.get('type')?.value === 'leave' ? 'Leave Period' : 'Item' }}
+                            </button>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-outline-primary mt-3" (click)="addItem()">
-                        <i class="fas fa-plus"></i> Add Another Item
-                    </button>
                 </div>
 
                 <!-- Action Buttons -->
@@ -409,6 +419,12 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 24px;
+        width: 100%;
+    }
+    
+    .form-column {
+        width: 100%;
+        min-width: 0; /* Prevents overflow issues */
     }
     
     .form-group {
@@ -434,6 +450,25 @@
         border: 1px solid #ced4da;
         border-radius: 5px;
         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        max-width: 100%;
+        overflow: visible;
+        text-overflow: ellipsis;
+    }
+    
+    select.form-control {
+        padding-right: 30px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        box-sizing: border-box;
+        width: 100%;
+    }
+    
+    .select-full-width {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
     
     .form-control:focus {
@@ -486,17 +521,32 @@
         background-color: #17a2b8;
     }
     
-    /* Items Section */
+    /* Section and Items */
+    .section-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 24px;
+        border: 1px solid #eaeaea;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    
     .section-title {
         font-size: 18px;
         font-weight: 600;
         color: #2c3e50;
-        margin-bottom: 16px;
-        padding-bottom: 8px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
         border-bottom: 1px solid #eaeaea;
     }
     
-    .items-container {
+    .equipment-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .items-list {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 16px;
@@ -507,6 +557,11 @@
         border-radius: 6px;
         overflow: hidden;
         border: 1px solid #eaeaea;
+        transition: box-shadow 0.2s ease;
+    }
+    
+    .item-card:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
     }
     
     .item-header {
@@ -515,6 +570,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        border-bottom: 1px solid #eaeaea;
     }
     
     .item-header h5 {
@@ -529,7 +585,13 @@
     }
     
     .item-fields {
-        padding: 12px;
+        padding: 16px;
+    }
+    
+    .add-item-button {
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-start;
     }
     
     /* Action Buttons */
@@ -805,14 +867,103 @@
     }
     
     /* Responsive Adjustments */
-    @media (max-width: 768px) {
+    @media (max-width: 992px) {
         .form-grid,
         .request-info-grid {
             grid-template-columns: 1fr;
+            gap: 15px;
         }
         
-        .items-container {
+        .items-list {
             grid-template-columns: 1fr;
+        }
+        
+        .card-body {
+            padding: 16px 15px;
+        }
+        
+        .section-container {
+            padding: 15px;
+        }
+        
+        .item-fields {
+            padding: 12px;
+        }
+        
+        .request-summary {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .main-actions {
+            flex-wrap: wrap;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+        }
+    }
+    
+    /* Add these styles at the end of the style section */
+    .custom-select-wrapper {
+        position: relative;
+        width: 100%;
+        display: block;
+    }
+    
+    .custom-select-wrapper::after {
+        content: "▼";
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        pointer-events: none;
+        font-size: 10px;
+        color: #6c757d;
+    }
+    
+    .custom-select {
+        width: 100%;
+        padding: 10px 35px 10px 12px !important;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+    
+    /* Override any browser-specific styles */
+    select.form-control {
+        box-sizing: border-box;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: none;
+        padding: 05px 35px 05px 12px !important;
+    }
+    
+    select.form-control option {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 10px 12px;
+        color: #333;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    @media (max-width: 992px) {
+        .custom-select, select.form-control {
+            max-width: 100%;
+            width: 100%;
         }
     }
 </style>
