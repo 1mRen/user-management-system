@@ -225,10 +225,4 @@ export class ListComponent implements OnInit {
             `${item.name} (${item.quantity})`
         ).join(', ');
     }
-
-    // Debug function to navigate to edit
-    debugNavigateToEdit(id: number) {
-        console.log('Debug: Attempting to navigate to edit page for request ID:', id);
-        window.location.href = `/requests/edit/${id}`;
-    }
 } 
