@@ -9,15 +9,7 @@ import { first } from 'rxjs/operators';
     selector: 'app-request-list',
     templateUrl: './request-list.component.html'
 })
-export class RequestListComponent implements OnInit {
-    requests: Request[] = [];
-    loading = false;
-    selectedRequest: Request | null = null;
-    approvalComments: string = '';
-    rejectionReason: string = '';
-    showApproveModal = false;
-    showRejectModal = false;
-    submitting = false;
+export class RequestListComponent implements OnInit {    requests: Request[] = [];    loading = false;
     
     constructor(
         private requestService: RequestService,
@@ -68,69 +60,7 @@ export class RequestListComponent implements OnInit {
         });
     }
 
-    viewDetails(id: number) {
-        this.router.navigate(['edit', id], { relativeTo: this.route });
-    }
-
-    openApproveModal(request: Request) {
-        this.selectedRequest = request;
-        this.approvalComments = '';
-        this.showApproveModal = true;
-    }
-
-    openRejectModal(request: Request) {
-        this.selectedRequest = request;
-        this.rejectionReason = '';
-        this.showRejectModal = true;
-    }
-
-    cancelModal() {
-        this.showApproveModal = false;
-        this.showRejectModal = false;
-        this.selectedRequest = null;
-    }
-
-    approveRequest() {
-        if (!this.selectedRequest) return;
-        
-        this.submitting = true;
-        this.requestService.approve(this.selectedRequest.id, this.approvalComments)
-            .pipe(first())
-            .subscribe({
-                next: () => {
-                    this.alertService.success('Request approved successfully');
-                    this.loadRequests();
-                    this.showApproveModal = false;
-                    this.submitting = false;
-                },
-                error: (error) => {
-                    console.error('Error approving request:', error);
-                    this.alertService.error('Failed to approve request: ' + (error.message || 'Unknown error'));
-                    this.submitting = false;
-                }
-            });
-    }
-
-    rejectRequest() {
-        if (!this.selectedRequest || !this.rejectionReason) return;
-        
-        this.submitting = true;
-        this.requestService.reject(this.selectedRequest.id, this.rejectionReason)
-            .pipe(first())
-            .subscribe({
-                next: () => {
-                    this.alertService.success('Request rejected successfully');
-                    this.loadRequests();
-                    this.showRejectModal = false;
-                    this.submitting = false;
-                },
-                error: (error) => {
-                    console.error('Error rejecting request:', error);
-                    this.alertService.error('Failed to reject request: ' + (error.message || 'Unknown error'));
-                    this.submitting = false;
-                }
-            });
-    }
+    viewDetails(id: number) {        this.router.navigate(['edit', id], { relativeTo: this.route });    }
 
     getStatusClass(status: string): string {
         switch (status.toLowerCase()) {

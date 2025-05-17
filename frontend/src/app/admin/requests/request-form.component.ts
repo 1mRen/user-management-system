@@ -5,6 +5,7 @@ import { RequestService, Request } from './request.service';
 import { EmployeeService } from '../employees/employee.service';
 import { AlertService } from '@app/_services';
 import { first } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-request-form',
@@ -18,6 +19,13 @@ export class RequestFormComponent implements OnInit {
     submitted = false;
     employees: any[] = [];
     request: Request | null = null;
+    
+    // Approve/Reject Modal variables
+    showApproveModal = false;
+    showRejectModal = false;
+    approvalComments = '';
+    rejectionReason = '';
+    submitting = false;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -269,5 +277,63 @@ export class RequestFormComponent implements OnInit {
             case 'pending': return 'status-warning';
             default: return 'status-info';
         }
+    }
+    
+    // Modal methods
+    openApproveModal() {
+        this.approvalComments = '';
+        this.showApproveModal = true;
+    }
+    
+    openRejectModal() {
+        this.rejectionReason = '';
+        this.showRejectModal = true;
+    }
+    
+    cancelModal() {
+        this.showApproveModal = false;
+        this.showRejectModal = false;
+    }
+    
+    approveRequest() {
+        if (!this.id) return;
+        
+        this.submitting = true;
+        this.requestService.approve(+this.id, this.approvalComments)
+            .pipe(first())
+            .subscribe({
+                next: () => {
+                    this.alertService.success('Request approved successfully', { keepAfterRouteChange: true });
+                    this.showApproveModal = false;
+                    this.submitting = false;
+                    // Refresh page to show updated status
+                    this.router.navigate(['/admin/requests']);
+                },
+                error: (error) => {
+                    this.alertService.error('Failed to approve request: ' + error);
+                    this.submitting = false;
+                }
+            });
+    }
+    
+    rejectRequest() {
+        if (!this.id || !this.rejectionReason) return;
+        
+        this.submitting = true;
+        this.requestService.reject(+this.id, this.rejectionReason)
+            .pipe(first())
+            .subscribe({
+                next: () => {
+                    this.alertService.success('Request rejected successfully', { keepAfterRouteChange: true });
+                    this.showRejectModal = false;
+                    this.submitting = false;
+                    // Refresh page to show updated status
+                    this.router.navigate(['/admin/requests']);
+                },
+                error: (error) => {
+                    this.alertService.error('Failed to reject request: ' + error);
+                    this.submitting = false;
+                }
+            });
     }
 } 
