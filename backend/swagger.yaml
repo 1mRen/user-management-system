@@ -656,6 +656,801 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
+  # Departments API
+  /departments:
+    get:
+      summary: Get all departments
+      description: Returns a list of all departments
+      operationId: getAllDepartments
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Department"
+              example:
+                - id: 1
+                  name: "IT Department"
+                  description: "Handles IT operations"
+                  code: "IT"
+                  location: "Floor 3"
+                  accountId: 1
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+                  isActive: true
+                - id: 2
+                  name: "HR Department"
+                  description: "Handles HR operations"
+                  code: "HR"
+                  location: "Floor 2"
+                  accountId: 2
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+                  isActive: true
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      summary: Create a new department
+      description: Admin only - Create a new department
+      operationId: createDepartment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDepartmentRequest"
+            example:
+              name: "IT Department"
+              description: "Handles IT operations"
+              code: "IT"
+              location: "Floor 3"
+              accountId: 1
+      responses:
+        "200":
+          description: Department created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+              example:
+                id: 1
+                name: "IT Department"
+                description: "Handles IT operations"
+                code: "IT"
+                location: "Floor 3"
+                accountId: 1
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+                isActive: true
+        "400":
+          description: Invalid input
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /departments/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        description: Department ID
+    get:
+      summary: Get department by ID
+      description: Returns a single department by ID
+      operationId: getDepartmentById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Department details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+              example:
+                id: 1
+                name: "IT Department"
+                description: "Handles IT operations"
+                code: "IT"
+                location: "Floor 3"
+                accountId: 1
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+                isActive: true
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    put:
+      summary: Update department
+      description: Admin only - Update department details
+      operationId: updateDepartment
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDepartmentRequest"
+            example:
+              name: "IT Department Updated"
+              description: "Handles IT operations and support"
+              code: "IT"
+              location: "Floor 4"
+              accountId: 1
+      responses:
+        "200":
+          description: Department updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Department"
+              example:
+                id: 1
+                name: "IT Department Updated"
+                description: "Handles IT operations and support"
+                code: "IT"
+                location: "Floor 4"
+                accountId: 1
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-02T12:00:00Z"
+                isActive: true
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    delete:
+      summary: Delete department
+      description: Admin only - Delete a department
+      operationId: deleteDepartment
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Department deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Department deleted successfully"
+              example:
+                message: "Department deleted successfully"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  # Employees API
+  /employees:
+    get:
+      summary: Get all employees
+      description: Returns a list of all employees
+      operationId: getAllEmployees
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of employees
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Employee"
+              example:
+                - id: 1
+                  accountId: 1
+                  departmentId: 1
+                  position: "Software Engineer"
+                  salary: 60000.00
+                  startDate: "2024-06-01T12:00:00Z"
+                  endDate: null
+                  employeeNumber: "EMP001"
+                  manager: false
+                  status: "active"
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+                  isActive: true
+                  Account:
+                    id: 1
+                    firstName: "John"
+                    lastName: "Doe"
+                    email: "john.doe@example.com"
+                  Department:
+                    id: 1
+                    name: "IT Department"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      summary: Create a new employee
+      description: Admin only - Create a new employee
+      operationId: createEmployee
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEmployeeRequest"
+            example:
+              accountId: 1
+              departmentId: 1
+              position: "Software Engineer"
+              salary: 60000.00
+              startDate: "2024-06-01T12:00:00Z"
+              employeeNumber: "EMP001"
+              manager: false
+      responses:
+        "200":
+          description: Employee created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+              example:
+                id: 1
+                accountId: 1
+                departmentId: 1
+                position: "Software Engineer"
+                salary: 60000.00
+                startDate: "2024-06-01T12:00:00Z"
+                endDate: null
+                employeeNumber: "EMP001"
+                manager: false
+                status: "active"
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+                isActive: true
+                Account:
+                  id: 1
+                  firstName: "John"
+                  lastName: "Doe"
+                  email: "john.doe@example.com"
+                Department:
+                  id: 1
+                  name: "IT Department"
+        "400":
+          description: Invalid input
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /employees/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        description: Employee ID
+    get:
+      summary: Get employee by ID
+      description: Returns a single employee by ID
+      operationId: getEmployeeById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Employee details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+              example:
+                id: 1
+                accountId: 1
+                departmentId: 1
+                position: "Software Engineer"
+                salary: 60000.00
+                startDate: "2024-06-01T12:00:00Z"
+                endDate: null
+                employeeNumber: "EMP001"
+                manager: false
+                status: "active"
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+                isActive: true
+                Account:
+                  id: 1
+                  firstName: "John"
+                  lastName: "Doe"
+                  email: "john.doe@example.com"
+                Department:
+                  id: 1
+                  name: "IT Department"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    put:
+      summary: Update employee
+      description: Admin only - Update employee details
+      operationId: updateEmployee
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEmployeeRequest"
+            example:
+              position: "Senior Software Engineer"
+              salary: 70000.00
+              departmentId: 2
+              manager: true
+              status: "active"
+              endDate: null
+      responses:
+        "200":
+          description: Employee updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Employee"
+              example:
+                id: 1
+                accountId: 1
+                departmentId: 2
+                position: "Senior Software Engineer"
+                salary: 70000.00
+                startDate: "2024-06-01T12:00:00Z"
+                endDate: null
+                employeeNumber: "EMP001"
+                manager: true
+                status: "active"
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-02T12:00:00Z"
+                isActive: true
+                Account:
+                  id: 1
+                  firstName: "John"
+                  lastName: "Doe"
+                  email: "john.doe@example.com"
+                Department:
+                  id: 2
+                  name: "HR Department"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    delete:
+      summary: Delete employee
+      description: Admin only - Delete an employee
+      operationId: deleteEmployee
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Employee deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Employee deleted successfully"
+              example:
+                message: "Employee deleted successfully"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  # Requests API
+  /requests:
+    get:
+      summary: Get all requests
+      description: Returns a list of all requests
+      operationId: getAllRequests
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Request"
+              example:
+                - id: 1
+                  employeeId: 1
+                  type: "leave"
+                  title: "Annual Leave"
+                  description: "Vacation leave for 2 weeks"
+                  status: "pending"
+                  priority: "medium"
+                  requestDate: "2024-06-01T12:00:00Z"
+                  completionDate: null
+                  approverId: 2
+                  details:
+                    date:
+                      - start-date: "2024-07-01"
+                        end-date: "2024-07-14"
+                        purpose: "Vacation"
+                        days: 14
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+                - id: 2
+                  employeeId: 2
+                  type: "equipment"
+                  title: "Laptop Request"
+                  description: "Requesting a new laptop"
+                  status: "approved"
+                  priority: "high"
+                  requestDate: "2024-06-01T12:00:00Z"
+                  completionDate: "2024-06-05T12:00:00Z"
+                  approverId: 1
+                  details:
+                    items:
+                      - name: "Laptop"
+                        quantity: 1
+                        purpose: "Development"
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-05T12:00:00Z"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      summary: Create a new request
+      description: Create a new request
+      operationId: createRequest
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRequestRequest"
+            example:
+              employeeId: 1
+              type: "leave"
+              title: "Annual Leave"
+              description: "Vacation leave for 2 weeks"
+              priority: "medium"
+              date:
+                - start-date: "2024-07-01"
+                  end-date: "2024-07-14"
+                  purpose: "Vacation"
+      responses:
+        "200":
+          description: Request created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+              example:
+                id: 1
+                employeeId: 1
+                type: "leave"
+                title: "Annual Leave"
+                description: "Vacation leave for 2 weeks"
+                status: "pending"
+                priority: "medium"
+                requestDate: "2024-06-01T12:00:00Z"
+                completionDate: null
+                approverId: 2
+                details:
+                  date:
+                    - start-date: "2024-07-01"
+                      end-date: "2024-07-14"
+                      purpose: "Vacation"
+                      days: 14
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+        "400":
+          description: Invalid input
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /requests/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        description: Request ID
+    get:
+      summary: Get request by ID
+      description: Returns a single request by ID
+      operationId: getRequestById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Request details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+              example:
+                id: 1
+                employeeId: 1
+                type: "leave"
+                title: "Annual Leave"
+                description: "Vacation leave for 2 weeks"
+                status: "pending"
+                priority: "medium"
+                requestDate: "2024-06-01T12:00:00Z"
+                completionDate: null
+                approverId: 2
+                details:
+                  date:
+                    - start-date: "2024-07-01"
+                      end-date: "2024-07-14"
+                      purpose: "Vacation"
+                      days: 14
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    put:
+      summary: Update request
+      description: Update request details
+      operationId: updateRequest
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRequestRequest"
+            example:
+              status: "approved"
+              priority: "high"
+              description: "Vacation leave for 2 weeks - approved"
+      responses:
+        "200":
+          description: Request updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+              example:
+                id: 1
+                employeeId: 1
+                type: "leave"
+                title: "Annual Leave"
+                description: "Vacation leave for 2 weeks - approved"
+                status: "approved"
+                priority: "high"
+                requestDate: "2024-06-01T12:00:00Z"
+                completionDate: "2024-06-10T12:00:00Z"
+                approverId: 2
+                details:
+                  date:
+                    - start-date: "2024-07-01"
+                      end-date: "2024-07-14"
+                      purpose: "Vacation"
+                      days: 14
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-10T12:00:00Z"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    delete:
+      summary: Delete request
+      description: Delete a request
+      operationId: deleteRequest
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Request deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Request deleted successfully"
+              example:
+                message: "Request deleted successfully"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  # Workflows API
+  /workflows:
+    get:
+      summary: Get all workflows
+      description: Returns a list of all workflows
+      operationId: getAllWorkflows
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workflow"
+              example:
+                - id: 1
+                  employeeId: 1
+                  type: "Onboarding"
+                  status: "Pending"
+                  details:
+                    task: "Setup workstation"
+                  assignedTo: 2
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+                - id: 2
+                  employeeId: 2
+                  type: "Promotion"
+                  status: "Completed"
+                  details:
+                    oldPosition: "Junior Developer"
+                    newPosition: "Senior Developer"
+                    reason: "Promotion for outstanding performance"
+                  assignedTo: 3
+                  created: "2024-06-01T12:00:00Z"
+                  updated: "2024-06-01T12:00:00Z"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      summary: Create a new workflow
+      description: Admin only - Create a new workflow
+      operationId: createWorkflow
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWorkflowRequest"
+            example:
+              employeeId: 1
+              type: "Onboarding"
+              status: "Pending"
+              details:
+                task: "Setup workstation"
+              assignedTo: 2
+      responses:
+        "200":
+          description: Workflow created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+              example:
+                id: 1
+                employeeId: 1
+                type: "Onboarding"
+                status: "Pending"
+                details:
+                  task: "Setup workstation"
+                assignedTo: 2
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+        "400":
+          description: Invalid input
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /workflows/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+        description: Workflow ID
+    get:
+      summary: Get workflow by ID
+      description: Returns a single workflow by ID
+      operationId: getWorkflowById
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Workflow details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+              example:
+                id: 1
+                employeeId: 1
+                type: "Onboarding"
+                status: "Pending"
+                details:
+                  task: "Setup workstation"
+                assignedTo: 2
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    put:
+      summary: Update workflow
+      description: Admin only - Update workflow details
+      operationId: updateWorkflow
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWorkflowRequest"
+            example:
+              type: "Promotion"
+              status: "Completed"
+              details:
+                oldPosition: "Junior Developer"
+                newPosition: "Senior Developer"
+                reason: "Promotion for outstanding performance"
+              assignedTo: 3
+      responses:
+        "200":
+          description: Workflow updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+              example:
+                id: 2
+                employeeId: 2
+                type: "Promotion"
+                status: "Completed"
+                details:
+                  oldPosition: "Junior Developer"
+                  newPosition: "Senior Developer"
+                  reason: "Promotion for outstanding performance"
+                assignedTo: 3
+                created: "2024-06-01T12:00:00Z"
+                updated: "2024-06-01T12:00:00Z"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    delete:
+      summary: Delete workflow
+      description: Admin only - Delete a workflow
+      operationId: deleteWorkflow
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Workflow deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Workflow deleted successfully"
+              example:
+                message: "Workflow deleted successfully"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -683,3 +1478,303 @@ components:
               message:
                 type: string
                 example: "Not Found"
+  schemas:
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "IT Department"
+        description:
+          type: string
+          example: "Information Technology Department"
+        code:
+          type: string
+          example: "IT"
+        location:
+          type: string
+          example: "Floor 3"
+        accountId:
+          type: integer
+          example: 1
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+    CreateDepartmentRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "IT Department"
+        description:
+          type: string
+          example: "Information Technology Department"
+        code:
+          type: string
+          example: "IT"
+        location:
+          type: string
+          example: "Floor 3"
+        accountId:
+          type: integer
+          example: 1
+    UpdateDepartmentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "IT Department"
+        description:
+          type: string
+          example: "Information Technology Department"
+        code:
+          type: string
+          example: "IT"
+        location:
+          type: string
+          example: "Floor 3"
+        accountId:
+          type: integer
+          example: 1
+
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        position:
+          type: string
+          example: "Software Engineer"
+        departmentId:
+          type: integer
+          example: 1
+        accountId:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreateEmployeeRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - position
+        - departmentId
+      properties:
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        position:
+          type: string
+          example: "Software Engineer"
+        departmentId:
+          type: integer
+          example: 1
+        accountId:
+          type: integer
+          example: 1
+    UpdateEmployeeRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        position:
+          type: string
+          example: "Software Engineer"
+        departmentId:
+          type: integer
+          example: 1
+        accountId:
+          type: integer
+          example: 1
+
+    Request:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        type:
+          type: string
+          example: "Leave Request"
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          example: "pending"
+        description:
+          type: string
+          example: "Annual leave request"
+        employeeId:
+          type: integer
+          example: 1
+        workflowId:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreateRequestRequest:
+      type: object
+      required:
+        - type
+        - description
+        - employeeId
+        - workflowId
+      properties:
+        type:
+          type: string
+          example: "Leave Request"
+        description:
+          type: string
+          example: "Annual leave request"
+        employeeId:
+          type: integer
+          example: 1
+        workflowId:
+          type: integer
+          example: 1
+    UpdateRequestRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          example: "Leave Request"
+        status:
+          type: string
+          enum: [pending, approved, rejected]
+          example: "approved"
+        description:
+          type: string
+          example: "Annual leave request"
+        employeeId:
+          type: integer
+          example: 1
+        workflowId:
+          type: integer
+          example: 1
+
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Leave Approval Workflow"
+        description:
+          type: string
+          example: "Standard workflow for leave requests"
+        steps:
+          type: array
+          items:
+            type: object
+            properties:
+              order:
+                type: integer
+                example: 1
+              role:
+                type: string
+                example: "Manager"
+              action:
+                type: string
+                example: "approve"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CreateWorkflowRequest:
+      type: object
+      required:
+        - name
+        - steps
+      properties:
+        name:
+          type: string
+          example: "Leave Approval Workflow"
+        description:
+          type: string
+          example: "Standard workflow for leave requests"
+        steps:
+          type: array
+          items:
+            type: object
+            properties:
+              order:
+                type: integer
+                example: 1
+              role:
+                type: string
+                example: "Manager"
+              action:
+                type: string
+                example: "approve"
+    UpdateWorkflowRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Leave Approval Workflow"
+        description:
+          type: string
+          example: "Standard workflow for leave requests"
+        steps:
+          type: array
+          items:
+            type: object
+            properties:
+              order:
+                type: integer
+                example: 1
+              role:
+                type: string
+                example: "Manager"
+              action:
+                type: string
+                example: "approve"

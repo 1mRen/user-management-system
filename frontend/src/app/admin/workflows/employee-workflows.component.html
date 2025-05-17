@@ -1,0 +1,64 @@
+<div class="card">
+    <div class="card-header">
+        <h1 class="mb-0">WORKFLOWS FOR EMPLOYEE {{ employeeId }}</h1>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Details</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let workflow of workflows">
+                    <td>{{ workflow.type }}</td>
+                    <td>
+                        <!-- Onboarding workflow -->
+                        <div *ngIf="workflow.type === 'Onboarding'">
+                            Task: {{ workflow.details?.task || 'Setup workstation' }}
+                        </div>
+                        
+                        <!-- Request workflow -->
+                        <div *ngIf="workflow.type.startsWith('Request:')">
+                            <div>requestId: {{ workflow.details?.requestId || 'N/A' }}</div>
+                            <div>requestType: {{ workflow.details?.requestType || workflow.type.split(':')[1]?.trim() }}</div>
+                            <div>requesterId: {{ workflow.employeeId }}</div>
+                            <div>message: Review {{ workflow.details?.requestType || 'request' }} #{{ workflow.details?.requestId }} from Employee ID {{ workflow.employeeId }}.</div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge" [ngClass]="{
+                            'bg-warning text-dark': workflow.status.toLowerCase() === 'pending',
+                            'bg-success': workflow.status.toLowerCase() === 'completed' || workflow.status.toLowerCase() === 'approved',
+                            'bg-danger': workflow.status.toLowerCase() === 'cancelled' || workflow.status.toLowerCase() === 'rejected'
+                        }">
+                            {{ workflow.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <select class="form-select form-select-sm" (change)="updateStatus(workflow.id, $event)" [value]="workflow.status">
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+                <tr *ngIf="!workflows.length">
+                    <td colspan="4" class="text-center">
+                        <span class="p-2">No workflows found for this employee</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer d-flex justify-content-end">
+        <button class="btn btn-secondary" (click)="goBack()">Back to Employees</button>
+    </div>
+</div> 

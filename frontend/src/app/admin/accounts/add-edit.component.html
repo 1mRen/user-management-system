@@ -79,6 +79,44 @@
 		</div>
 	</div>
 
+	<!-- Account Status Section (Only for Edit mode and non-admin accounts) -->
+	<div *ngIf="!isAddMode && account && !isAdmin" class="form-row mb-3 mt-3">
+		<div class="form-group col-12">
+			<div class="card">
+				<div class="card-header">
+					Account Status
+				</div>
+				<div class="card-body">
+					<div class="d-flex align-items-center justify-content-between">
+						<div>
+							<span class="mr-3">Status:</span>
+							<span 
+								[class]="account.isActive ? 'badge bg-success' : 'badge bg-danger'"
+								style="font-size: 14px; padding: 5px 10px;">
+								{{ account.isActive ? 'Active' : 'Inactive' }}
+							</span>
+						</div>
+						<button 
+							type="button" 
+							class="btn btn-sm" 
+							[class.btn-danger]="account.isActive"
+							[class.btn-success]="!account.isActive"
+							(click)="toggleStatus()"
+							[disabled]="loading">
+							{{ account.isActive ? 'Deactivate Account' : 'Activate Account' }}
+							<span *ngIf="loading" class="spinner-border spinner-border-sm ml-1"></span>
+						</button>
+					</div>
+					<small class="text-muted mt-2 d-block">
+						{{ account.isActive ? 
+							'Deactivating this account will prevent the user from logging in.' : 
+							'Activating this account will allow the user to log in again.' }}
+					</small>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 	<div *ngIf="!isAddMode">
 		<h3 class="pt-3">Change Password</h3>
 		<p>Leave blank to keep the same password</p>

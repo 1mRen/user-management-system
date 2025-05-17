@@ -25,15 +25,6 @@
       </td>
       <td style="white-space: nowrap">
         <a routerLink="edit/{{ account.id }}" class="btn btn-sm btn-primary mr-1">Edit</a>
-        <!-- Only show toggle button if the account is NOT an admin -->
-					<button *ngIf="!isAdmin(account)"
-						(click)="toggleAccountStatus(account)" 
-						[class]="account.isActive ? 'btn btn-sm btn-danger ml-1' : 'btn btn-sm btn-success ml-1'"
-						[disabled]="account.isToggling">
-						{{ account.isActive ? 'Deactivate' : 'Activate' }}
-							<span *ngIf="account.isToggling" class="spinner-border spinner-border-sm"></span>
-					</button>
-
       </td>
     </tr>
     <tr *ngIf="!accounts">

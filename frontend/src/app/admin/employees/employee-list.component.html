@@ -1,0 +1,200 @@
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Employee ID</th>
+                <th>Account</th>
+                <th>Position</th>
+                <th>Department</th>
+                <th>Hire Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let employee of employees">
+                <td>{{ employee.employeeNumber }}</td>
+                <td>{{ employee.account?.email }}</td>
+                <td>{{ employee.position }}</td>
+                <td>{{ employee.department?.name }}</td>
+                <td>{{ employee.startDate | date:'M/d/yyyy' }}</td>
+                <td>
+                    <span class="status-badge" 
+                        [ngClass]="{
+                            'status-active': employee.status === 'active', 
+                            'status-warning': employee.status === 'on_leave',
+                            'status-danger': employee.status === 'terminated' || employee.status === 'suspended'
+                        }">
+                        {{ employee.status === 'active' ? 'Active' : 
+                           employee.status === 'on_leave' ? 'On Leave' : 
+                           employee.status === 'terminated' ? 'Terminated' : 'Suspended' }}
+                    </span>
+                </td>
+                <td class="action-buttons">
+                    <button class="btn btn-info" (click)="viewRequests(employee.id)">Requests</button>
+                    <button class="btn btn-info" (click)="viewWorkflows(employee.id)">Workflows</button>
+                    <button class="btn btn-warning" (click)="transferEmployee(employee)">Transfer</button>
+                    <a [routerLink]="['edit', employee.id]" class="btn btn-primary">Edit</a>
+                </td>
+            </tr>
+            <tr *ngIf="!employees || employees.length === 0">
+                <td colspan="7" class="text-center">
+                    <span *ngIf="loading" class="spinner-border spinner-border-lg align-center"></span>
+                    <span *ngIf="!loading">No employees found</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-2">
+    <a routerLink="add" class="btn btn-success">Add Employee</a>
+</div>
+
+<!-- Transfer Modal -->
+<div *ngIf="showTransferModal" class="modal-backdrop" (click)="cancelTransfer()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Transfer Employee</h5>
+                <button type="button" class="close" (click)="cancelTransfer()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="selectedEmployee" class="form-group">
+                    <label>Transfer {{ selectedEmployee.account?.firstName }} {{ selectedEmployee.account?.lastName }} to:</label>
+                    <select [(ngModel)]="selectedDepartmentId" class="form-control">
+                        <option [ngValue]="null" disabled>Select department</option>
+                        <option *ngFor="let dept of departments" [value]="dept.id">{{ dept.name }}</option>
+                    </select>
+                    <div class="form-group mt-3">
+                        <label>Reason:</label>
+                        <textarea [(ngModel)]="transferReason" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cancelTransfer()">Cancel</button>
+                <button type="button" class="btn btn-primary" 
+                        [disabled]="!selectedDepartmentId || transferInProgress" 
+                        (click)="confirmTransfer()">
+                    <span *ngIf="transferInProgress" class="spinner-border spinner-border-sm mr-1"></span>
+                    Transfer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table {
+        margin-bottom: 0;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    .table td, .table th {
+        padding: 0.75rem;
+        vertical-align: middle;
+        border: 1px solid #dee2e6;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 0.4rem 0.6rem;
+        border-radius: 0.25rem;
+        color: white;
+        text-align: center;
+        min-width: 5rem;
+    }
+    .status-active {
+        background-color: #28a745;
+    }
+    .status-warning {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .status-danger {
+        background-color: #dc3545;
+    }
+    .action-buttons {
+        white-space: nowrap;
+    }
+    .action-buttons .btn {
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+    .btn-info {
+        background-color: #17a2b8;
+        color: white;
+        border: none;
+    }
+    .btn-warning {
+        background-color: #ffc107;
+        color: #212529;
+        border: none;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+        border: none;
+    }
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1050;
+    }
+    .modal-dialog {
+        max-width: 500px;
+        margin: 1.75rem auto;
+    }
+    .modal-content {
+        background-color: white;
+        border-radius: 0.3rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5);
+    }
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .modal-body {
+        padding: 1rem;
+    }
+    .modal-footer {
+        padding: 1rem;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: flex-end;
+    }
+    .close {
+        border: none;
+        background: transparent;
+        font-size: 1.5rem;
+        font-weight: 700;
+        opacity: 0.5;
+        cursor: pointer;
+    }
+    .close:hover {
+        opacity: 1;
+    }
+    .mt-2 {
+        margin-top: 0.5rem;
+    }
+    .mt-3 {
+        margin-top: 1rem;
+    }
+</style> 
